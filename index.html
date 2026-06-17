@@ -1,0 +1,2605 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title> — CLO Measurement System</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pr:#11426E;--prl:#1e6aaa;--prxl:#e6f0fa;
+  --go:#C9A84C;
+  --k:#1a5a96;--kb:#daeaf8;
+  --s:#1a7a4a;--sb:#d4f2e4;
+  --v:#7a3a8a;--vb:#f0e0f8;
+  --ok:#1a7a4a;--okb:#d4f2e4;
+  --wn:#7a5000;--wnb:#fff3cc;
+  --er:#8a1a1a;--erb:#fde0e0;
+  --bg:#eef2f8;--sf:#fff;--bd:#d0d8e8;
+  --tx:#18273a;--mu:#5a6a7a;
+  --r:8px;--rl:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Cairo",sans-serif;background:var(--bg);color:var(--tx);font-size:14px}
+
+.hdr{background:linear-gradient(135deg,var(--pr),var(--prl));color:#fff;height:54px;display:flex;align-items:center;gap:12px;padding:0 1.5rem;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.2)}
+.hdr-ico{width:34px;height:34px;background:rgba(255,255,255,.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.hdr h1{font-size:14px;font-weight:700;line-height:1.2}
+.hdr small{font-size:10px;opacity:.7}
+.hdr-name{margin-right:auto;background:var(--go);color:#3a2600;font-size:11px;font-weight:700;padding:3px 14px;border-radius:20px;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hdr-prof{font-size:10px;opacity:.7;white-space:nowrap}
+
+.layout{display:flex;min-height:calc(100vh - 54px)}
+.sb{width:196px;background:var(--sf);border-left:1px solid var(--bd);flex-shrink:0;padding:6px 0;position:sticky;top:54px;height:calc(100vh - 54px);overflow-y:auto}
+.nv{display:flex;align-items:center;gap:8px;padding:10px 14px;cursor:pointer;color:var(--mu);font-size:12.5px;font-weight:500;border-right:3px solid transparent;transition:.12s}
+.nv:hover{background:var(--bg);color:var(--pr)}.nv.on{background:var(--prxl);color:var(--pr);border-right-color:var(--pr);font-weight:700}
+.nv-sep{height:1px;background:var(--bd);margin:5px 11px}
+.nv-lbl{font-size:10px;font-weight:700;color:var(--mu);padding:7px 14px 2px;letter-spacing:.5px}
+.main{flex:1;padding:1.2rem;overflow-y:auto;min-width:0}
+.pg{display:none}.pg.on{display:block}
+
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--rl);padding:1rem 1.2rem;margin-bottom:1rem}
+.ct{font-size:13.5px;font-weight:700;color:var(--pr);display:flex;align-items:center;gap:8px;padding-bottom:9px;border-bottom:1px solid var(--bd);margin-bottom:1rem}
+
+.mgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1rem}
+.met{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:11px;text-align:center;border-top:3px solid var(--bd)}
+.met.bl{border-top-color:var(--pr)}.met.go{border-top-color:var(--go)}.met.gr{border-top-color:var(--ok)}.met.pu{border-top-color:var(--v)}
+.mv{font-size:22px;font-weight:800;color:var(--pr)}.ml{font-size:11px;color:var(--mu);margin-top:2px}
+
+.fg{margin-bottom:10px}
+.lbl{font-size:12px;font-weight:700;color:var(--mu);display:block;margin-bottom:4px}
+.fc{width:100%;padding:8px 11px;border:1.5px solid var(--bd);border-radius:var(--r);font-family:"Cairo",sans-serif;font-size:13px;color:var(--tx);background:var(--sf);direction:ltr;transition:.15s;text-align:left}
+.fc:focus{outline:none;border-color:var(--pr);box-shadow:0 0 0 3px rgba(17,66,110,.08)}
+textarea.fc{resize:vertical;min-height:58px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px}
+
+.btn{padding:8px 18px;border-radius:var(--r);font-family:"Cairo",sans-serif;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:.12s}
+.btn-p{background:var(--pr);color:#fff}.btn-p:hover{background:var(--prl)}
+.btn-g{background:var(--go);color:#3a2600}
+.btn-o{background:transparent;border:1.5px solid var(--bd);color:var(--mu)}.btn-o:hover{border-color:var(--pr);color:var(--pr)}
+.btn-e{background:var(--prxl);color:var(--pr);border:1.5px solid #b0cce8}
+.btn-r{background:var(--erb);color:var(--er);border:1.5px solid #f0b0b0}
+.btn-sm{padding:4px 10px;font-size:11.5px}
+.brow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+
+.row{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--bg)}
+.row:last-child{border:none}
+.rcode{font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;background:var(--prxl);color:var(--pr);white-space:nowrap}
+.rdesc{flex:1;font-size:13px;line-height:1.4}
+.bw{width:110px;height:8px;background:var(--bg);border-radius:4px;overflow:hidden;flex-shrink:0}
+.bf{height:100%;border-radius:4px;transition:width .5s}
+.bpct{font-size:13px;font-weight:700;min-width:38px}
+
+.bb{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.b-ok{background:var(--okb);color:var(--ok)}.b-wn{background:var(--wnb);color:var(--wn)}.b-er{background:var(--erb);color:var(--er)}.b-na{background:var(--bg);color:var(--mu)}
+.tbK{background:var(--kb);color:var(--k);font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px}
+.tbS{background:var(--sb);color:var(--s);font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px}
+.tbV{background:var(--vb);color:var(--v);font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px}
+.bloom-tag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;color:#fff;display:inline-block;margin-top:3px}
+
+.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.tbl th{background:var(--bg);padding:7px 9px;font-size:11px;font-weight:700;color:var(--mu);border:1px solid var(--bd);white-space:nowrap;text-align:right}
+.tbl td{padding:6px 9px;border:1px solid var(--bd);vertical-align:middle}
+.tbl .ch{background:var(--prxl);color:var(--pr);font-size:10.5px;text-align:center}
+.tbl .nc{text-align:right;min-width:130px}
+.tbl .ctr{text-align:center}
+
+.mx-wrap{overflow-x:auto;margin-top:10px}
+.mx-tbl{border-collapse:collapse;font-size:12px}
+.mx-tbl th,.mx-tbl td{border:1px solid var(--bd);padding:5px 7px;text-align:center;white-space:nowrap;min-width:52px}
+.mx-tbl th.cloh{background:var(--pr);color:#fff;font-weight:700;text-align:right;min-width:110px;padding-right:12px;position:sticky;right:0;z-index:2}
+.mx-tbl th.qh{background:#3a7ab8;color:#fff;font-size:11px;font-weight:700}
+.mx-tbl td.cln{background:var(--prxl);color:var(--pr);font-weight:700;text-align:right;padding-right:10px;position:sticky;right:0;z-index:1}
+.mx-tbl td.tot{background:var(--prxl);color:var(--pr);font-weight:700}
+.mxi{width:46px;padding:4px;border:none;border-radius:4px;font-family:"Cairo",sans-serif;font-size:12.5px;text-align:center;background:transparent;color:var(--tx)}
+.mxi:focus{outline:2px solid var(--pr);background:var(--prxl)}
+.mxi.hv{background:#d0f0d0;color:#1a5a1a;font-weight:700}
+
+.si{width:50px;padding:4px 5px;border:1.5px solid var(--bd);border-radius:6px;font-family:"Cairo",sans-serif;font-size:12.5px;text-align:center}
+.si:focus{outline:none;border-color:var(--pr);background:var(--prxl)}
+.si.ov{border-color:var(--er);background:var(--erb)}
+
+.stabs{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap}
+.stab{padding:5px 13px;border:1.5px solid var(--bd);border-radius:20px;background:transparent;cursor:pointer;font-size:12px;font-weight:600;color:var(--mu);font-family:"Cairo",sans-serif;transition:.12s}
+.stab:hover{background:var(--bg)}.stab.on{border-color:var(--pr);background:var(--prxl);color:var(--pr)}
+
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:600;align-items:center;justify-content:center}
+.mo.on{display:flex}
+.mo-box{background:var(--sf);border-radius:var(--rl);padding:1.4rem;width:500px;max-width:95vw;max-height:90vh;overflow-y:auto;position:relative;box-shadow:0 8px 40px rgba(0,0,0,.18)}
+.mo-title{font-size:14px;font-weight:700;color:var(--pr);margin-bottom:1rem;padding-bottom:8px;border-bottom:1px solid var(--bd)}
+.mo-x{position:absolute;top:1rem;left:1rem;background:none;border:none;font-size:20px;cursor:pointer;color:var(--mu);line-height:1}
+
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(120px);background:var(--pr);color:#fff;padding:9px 22px;border-radius:30px;font-size:13px;font-weight:600;z-index:999;transition:transform .3s;pointer-events:none;box-shadow:0 4px 18px rgba(0,0,0,.2)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+.rh{background:linear-gradient(135deg,var(--pr),var(--prl));color:#fff;padding:1.1rem;border-radius:var(--rl);margin-bottom:1rem;text-align:center}
+.rh h2{font-size:16px;margin-bottom:4px}.rh p{font-size:11px;opacity:.8}
+
+.ptabs{display:flex;gap:6px;margin-bottom:1rem;border-bottom:2px solid var(--bd);padding-bottom:0}
+.ptab{padding:8px 16px;border:none;background:transparent;cursor:pointer;font-family:"Cairo",sans-serif;font-size:12.5px;font-weight:600;color:var(--mu);border-bottom:3px solid transparent;margin-bottom:-2px}
+.ptab:hover{color:var(--pr)}.ptab.on{color:var(--pr);border-bottom-color:var(--pr)}
+.psec{display:none}.psec.on{display:block}
+
+.dsec{display:flex;align-items:center;gap:2rem}
+.leg{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:13px}
+.dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+
+.info-card{background:linear-gradient(135deg,#fff,#f5f9ff);border:1px solid var(--bd);border-right:4px solid var(--pr);border-radius:var(--rl);padding:1rem 1.2rem;margin-bottom:1rem}
+.info-fixed{font-size:11.5px;color:var(--mu);font-weight:700;margin-bottom:8px;padding-bottom:7px;border-bottom:1px solid var(--bd)}
+.info-row{display:grid;grid-template-columns:1fr 1fr;gap:5px 24px;font-size:13px;margin-bottom:6px}
+.info-name{font-size:15px;font-weight:800;color:var(--pr);margin:6px 0}
+.info-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;font-size:12.5px;margin-bottom:6px}
+.lk{color:var(--mu);font-weight:600;font-size:11.5px}
+
+@media(max-width:768px){.sb{display:none}.mgrid{grid-template-columns:1fr 1fr}}
+@media print{
+  .sb,.hdr,.brow,.stabs,.btn{display:none!important}
+  .main{padding:0}
+  #official-report-card{border:none!important;max-width:100%!important}
+  .pg{display:none!important}
+  #pg-report{display:block!important}
+}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-ico">🎓</div>
+  <div>
+    <h1>CLO Measurement System</h1>
+    <small>Najran University — College of Science &amp; Arts — Dept. of Mathematics</small>
+  </div>
+  <div id="hdr-name" class="hdr-name">Course</div>
+  <div class="hdr-prof">Dr. Rashad Al-Jawfi</div>
+</div>
+<!-- COURSE REPORT PAGE -->
+<div class="pg" id="pg-coursereport">
+  <div class="rh">
+    <h2>📄 Course Report</h2>
+    <p>Generate a complete course report with manual data entry</p>
+  </div>
+  <div class="card" style="text-align:center; padding: 2rem;">
+    <div class="ct">📋 Generate Course Report</div>
+    <p style="font-size:13px;color:var(--mu);margin-bottom:1rem; margin-top: 1rem;">
+      The report will include CLO/PLO achievement data plus your manual entries 
+      (comments, recommendations, topics not covered, improvement plan).
+    </p>
+    <button class="btn btn-p" id="btn-open-report-modal" style="font-size:16px;padding:12px 32px; margin-top: 10px;">
+      📄 Create Course Report
+    </button>
+  </div>
+  </div>
+<div class="layout">
+<div class="sb">
+  <div class="nv-lbl">HOME</div>
+  <div class="nv" id="nv-info">📋 Course Info</div>
+  <div class="nv on" id="nv-ov">📊 Dashboard</div>
+  <div class="nv-sep"></div>
+  <div class="nv-lbl">SETUP</div>
+  <div class="nv" id="nv-stus">👥 Students</div>
+  <div class="nv" id="nv-plos">🔗 Program Outcomes (PLOs)</div>
+  <div class="nv" id="nv-clos">📋 Course Outcomes (CLOs)</div>
+  <div class="nv-sep"></div>
+  <div class="nv-lbl">ASSESSMENT</div>
+  <div class="nv" id="nv-qz">📝 Quizzes</div>
+  <div class="nv" id="nv-as">📄 Assignments</div>
+  <div class="nv" id="nv-mt">📑 Midterm Exams</div>
+  <div class="nv" id="nv-fe">🏁 Final Exam</div>
+  <div class="nv" id="nv-lb">🔬 Labs</div>
+  <div class="nv" id="nv-act">🎯 Other Activities</div>
+  <div class="nv-sep"></div>
+  <div class="nv-lbl">REPORTS</div>
+  <div class="nv" id="nv-screp">📊 Scores Report</div>
+  <div class="nv" id="nv-clor">📈 CLO Report</div>
+  <div class="nv" id="nv-plor">🔗 PLO Report</div>
+  <div class="nv" id="nv-finr">📄 Final Results</div>
+  <div class="nv" id="nv-grd">🏆 Grade Distribution</div>
+  <div class="nv-sep"></div>
+<div class="nv" id="nv-report">📑 Official Card</div>
+<div class="nv" id="nv-coursereport">📄 Course Report</div>
+<div class="nv" id="nv-set">📦 Backup</div>
+</div>
+
+<div class="main">
+
+<!-- OVERVIEW -->
+<div class="pg on" id="pg-ov">
+  <div class="info-card" id="info-card">
+    <div class="info-fixed">Najran University &nbsp;|&nbsp; College of Science &amp; Arts &nbsp;|&nbsp; Dept. of Mathematics &nbsp;&nbsp; </div>
+    <div class="info-row">
+      <div><span class="lk">Academic Year:</span> <strong id="i-year">—</strong></div>
+      <div><span class="lk">Semester:</span> <strong id="i-sem">—</strong></div>
+    </div>
+<div style="display:flex;align-items:baseline;gap:8px;margin:6px 0">
+  <span style="font-size:12px;color:var(--mu);font-weight:600;white-space:nowrap">Course Title:</span>
+  <span id="i-name" style="font-size:15px;font-weight:800;color:var(--pr)">—</span>
+</div>
+    <div class="info-grid">
+      <div><span class="lk">Course Code:</span><strong id="i-code">—</strong></div>
+      <div><span class="lk">Section:</span><strong id="i-sec">—</strong></div>
+      <div><span class="lk">Credit Hours:</span><strong id="i-cr">—</strong></div>
+      <div><span class="lk">No. of Students:</span><strong id="i-nstu">—</strong></div>
+    </div>
+    <div><span class="lk">Instructor:</span> <strong id="i-inst">—</strong></div>
+  </div>
+  <div class="mgrid">
+    <div class="met bl"><div class="mv" id="m-stu">0</div><div class="ml">Students</div></div>
+    <div class="met go"><div class="mv" id="m-clo">0</div><div class="ml">Learning Outcomes</div></div>
+    <div class="met gr"><div class="mv" id="m-avg">—</div><div class="ml">Avg. Achievement</div></div>
+    <div class="met pu"><div class="mv" id="m-ach">—</div><div class="ml">CLOs Achieved</div></div>
+  </div>
+  <div class="g3">
+    <div class="card" style="border-top:3px solid var(--k)"><div class="ct" style="color:var(--k)">🧠 Knowledge</div><div id="ov-K"></div></div>
+    <div class="card" style="border-top:3px solid var(--s)"><div class="ct" style="color:var(--s)">⚙️ Skill</div><div id="ov-S"></div></div>
+    <div class="card" style="border-top:3px solid var(--v)"><div class="ct" style="color:var(--v)">💎 Value</div><div id="ov-V"></div></div>
+  </div>
+  <div class="card">
+    <div class="ct">👥 Student Level Distribution</div>
+    <div class="dsec">
+      <canvas id="donut" width="120" height="120"></canvas>
+      <div>
+        <div class="leg"><div class="dot" style="background:#1a7a4a"></div>Mastered (≥80%): <strong id="l-m">0</strong></div>
+        <div class="leg"><div class="dot" style="background:#C9A84C"></div>Progressing (60-79%): <strong id="l-p">0</strong></div>
+        <div class="leg"><div class="dot" style="background:#c0392b"></div>Needs Support: <strong id="l-n">0</strong></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BASIC INFO -->
+<div class="pg" id="pg-info">
+  <div class="card" style="border-right:4px solid var(--pr);background:var(--prxl)">
+    <div class="ct">🏛️ Fixed Information</div>
+    <div style="font-size:13px;display:flex;flex-wrap:wrap;gap:8px 28px;color:var(--pr)">
+      <span><strong>Najran University</strong>  </span>
+      <span><strong>College of Science &amp; Arts</strong>  </span>
+      <span><strong>Dept. of Mathematics</strong>  </span>
+      <span><strong>System Designer:</strong> Dr. Rashad Al-Jawfi</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">📋 Course Data</div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+
+      <!-- Row 1: Academic Year + Semester -->
+      <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:center">
+        <div style="display:flex;align-items:center;gap:8px">
+          <label class="lbl" style="margin:0;white-space:nowrap">Academic Year:</label>
+          <input type="text" class="fc" id="s-year" placeholder="2026/2027" style="width:150px;padding:6px 10px">
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <label class="lbl" style="margin:0;white-space:nowrap">Semester:</label>
+          <input type="text" class="fc" id="s-sem" placeholder="First Semester" style="width:150px;padding:6px 10px">
+        </div>
+      </div>
+
+      <!-- Row 2: Course + Code + Section + Students -->
+      <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center">
+        <div style="display:flex;align-items:center;gap:8px">
+          <label class="lbl" style="margin:0;white-space:nowrap">Course Title:</label>
+          <input type="text" class="fc" id="s-name" placeholder=" " style="width:180px;padding:6px 10px">
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <label class="lbl" style="margin:0;white-space:nowrap">Course Code:</label>
+          <input type="text" class="fc" id="s-code-full" placeholder="232-Math-3" style="width:150px;padding:6px 10px" oninput="syncCodeParts(this.value)">
+          <input type="hidden" id="s-c1"><input type="hidden" id="s-c2"><input type="hidden" id="s-c3">
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <label class="lbl" style="margin:0;white-space:nowrap">Section:</label>
+          <input type="text" class="fc" id="s-sec" placeholder="  " style="width:70px;padding:6px 10px">
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <label class="lbl" style="margin:0;white-space:nowrap">No. of Students:</label>
+          <input type="text" class="fc" id="s-nstu" placeholder="—" style="width:60px;padding:6px 10px">
+        </div>
+      </div>
+=========================================================================================
+
+      <!-- Row 4: Additional Student Statistics -->
+      <!-- Additional Student Statistics -->
+      <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center; margin-top:10px;">
+        <div style="display:flex;align-items:center;gap:8px">
+          <label class="lbl" style="margin:0;white-space:nowrap">Students Started:</label>
+          <input type="text" class="fc" id="s-started" placeholder="0" style="width:50px;padding:6px 10px">
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <label class="lbl" style="margin:0;white-space:nowrap">Denied:</label>
+          <input type="text" class="fc" id="s-denied" placeholder="0" style="width:50px;padding:6px 10px">
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <label class="lbl" style="margin:0;white-space:nowrap">Withdrawn:</label>
+          <input type="text" class="fc" id="s-withdrawn" placeholder="0" style="width:50px;padding:6px 10px">
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <label class="lbl" style="margin:0;white-space:nowrap">Incomplete:</label>
+          <input type="text" class="fc" id="s-incomplete" placeholder="0" style="width:50px;padding:6px 10px">
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <label class="lbl" style="margin:0;white-space:nowrap">Absent:</label>
+          <input type="text" class="fc" id="s-absent" placeholder="0" style="width:50px;padding:6px 10px">
+        </div>
+      </div>
+=========================================================================================
+
+      <!-- Row 3: Instructor + Credit Hours -->
+      <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:center">
+        <div style="display:flex;align-items:center;gap:8px">
+          <label class="lbl" style="margin:0;white-space:nowrap">Instructor:</label>
+          <input type="text" class="fc" id="s-inst" placeholder="Rashad A. Al-Jawfi" style="width:220px;padding:6px 10px">
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <label class="lbl" style="margin:0;white-space:nowrap">Credit Hours:</label>
+          <input type="text" class="fc" id="s-cr" placeholder="3" style="width:60px;padding:6px 10px">
+        </div>
+      </div>
+
+      <!-- Save Button -->
+      <div>
+        <button class="btn btn-p" id="btn-save-info">💾 Save Data</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- STUDENTS -->
+<div class="pg" id="pg-stus">
+  <div class="card">
+    <div class="ct">➕ Add Student</div>
+    <div class="g2">
+      <div class="fg"><label class="lbl">Student ID</label><input type="text" class="fc" id="ns-id" placeholder=""></div>
+      <div class="fg"><label class="lbl">Full Name</label><input type="text" class="fc" id="ns-name" placeholder=""></div>
+    </div>
+    <div class="brow">
+      <button class="btn btn-p" id="btn-add-stu">➕ Add</button>
+      <button class="btn btn-o" id="btn-bulk-tog">📋 Bulk Input</button>
+      <button class="btn btn-r" id="btn-clr-stus">🗑 Clear All</button>
+    </div>
+    <div id="bulk-area" style="display:none;margin-top:10px">
+      <label class="lbl">One student per line — ID then Name</label>
+      <textarea class="fc" id="bulk-txt" style="min-height:90px" placeholder=""></textarea>
+      <button class="btn btn-p" id="btn-bulk-add" style="margin-top:8px">💾 Add All</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">👥 Students (<span id="stu-cnt">0</span>)</div>
+    <div style="overflow-x:auto;max-height:460px;overflow-y:auto">
+      <table class="tbl"><thead><tr><th style="width:40px">#</th><th>Student ID</th><th class="nc">Name</th><th style="width:60px"></th></tr></thead>
+      <tbody id="stu-body"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- PLOs -->
+<div class="pg" id="pg-plos">
+  <div class="card">
+    <div class="ct">➕ Add Program Outcome</div>
+    <div class="g2">
+      <div class="fg"><label class="lbl">Code</label><input type="text" class="fc" id="np-code" placeholder="PLO-K1"></div>
+      <div class="fg"><label class="lbl">Type</label>
+        <select class="fc" id="np-type" style="direction:ltr;text-align:left"><option value="K">🧠 Knowledge</option><option value="S">⚙️ Skill</option><option value="V">💎 Value</option></select>
+      </div>
+    </div>
+    <div class="fg"><label class="lbl">Description</label><textarea class="fc" id="np-desc" placeholder="Program outcome description..."></textarea></div>
+    <div class="brow">
+      <button class="btn btn-p" id="btn-add-plo">➕ Add</button>
+      <button class="btn btn-o" id="btn-cancel-plo" style="display:none">✕ Cancel</button>
+    </div>
+    <input type="hidden" id="np-ei" value="">
+  </div>
+  <div class="card"><div class="ct">🔗 PLOs List</div><div id="plo-list"></div></div>
+</div>
+
+<!-- CLOs -->
+<div class="pg" id="pg-clos">
+  <div class="card">
+    <div class="ct">➕ Add Course Outcome</div>
+    <div class="g2">
+      <div class="fg"><label class="lbl">Code</label><input type="text" class="fc" id="nc-code" placeholder="CLO-K1"></div>
+      <div class="fg"><label class="lbl">Type</label>
+        <select class="fc" id="nc-type"><option value="K">🧠 Knowledge</option><option value="S">⚙️ Skill</option><option value="V">💎 Value</option></select>
+      </div>
+    </div>
+    <div class="fg"><label class="lbl">Description</label><textarea class="fc" id="nc-desc" placeholder="The student is able to..."></textarea></div>
+    <div class="g3">
+      <div class="fg"><label class="lbl">Bloom's Level</label>
+        <select class="fc" id="nc-bloom"><option>Remembering</option><option>Understanding</option><option>Applying</option><option>Analyzing</option><option>Evaluating</option><option>Creating</option></select>
+      </div>
+      <div class="fg"><label class="lbl">Pass Rate %</label><input type="text" class="fc" id="nc-pass" value="60"></div>
+      <div class="fg"><label class="lbl">Linked PLO</label><select class="fc" id="nc-plo"><option value="">—</option></select></div>
+
+    <div class="fg">
+      <label class="lbl">📋 Assessment Methods</label>
+      <textarea id="nc-assessment-methods" class="fc" rows="2" placeholder="e.g., Quizzes, Assignments, Midterm Exam, Final Exam..."></textarea>
+      <small style="font-size:10px; color:var(--mu)">Methods used to assess this CLO (will appear in Course Report)</small>
+    </div>    
+
+</div>
+    <div class="brow">
+      <button class="btn btn-p" id="btn-add-clo">➕ Add</button>
+      <button class="btn btn-o" id="btn-cancel-clo" style="display:none">✕ Cancel</button>
+    </div>
+    <input type="hidden" id="nc-ei" value="">
+  </div>
+  <div class="card">
+    <div class="ct">📋 CLOs List</div>
+    <div class="stabs">
+      <button class="stab on" id="stab-all">All</button>
+      <button class="stab" id="stab-K" style="color:var(--k);border-color:var(--k)">🧠 Knowledge</button>
+      <button class="stab" id="stab-S" style="color:var(--s);border-color:var(--s)">⚙️ Skill</button>
+      <button class="stab" id="stab-V" style="color:var(--v);border-color:var(--v)">💎 Value</button>
+    </div>
+    <div id="clo-list"></div>
+  </div>
+</div>
+
+<!-- ASSESSMENT PAGES -->
+<div class="pg" id="pg-qz"></div>
+<div class="pg" id="pg-as"></div>
+<div class="pg" id="pg-mt"></div>
+<div class="pg" id="pg-fe"></div>
+<div class="pg" id="pg-lb"></div>
+<div class="pg" id="pg-act"></div>
+
+
+<!-- SCORES REPORT -->
+<div class="pg" id="pg-screp">
+  <div class="rh">
+    <h2>📊 Scores Report</h2>
+    <p id="screp-sub"></p>
+  </div>
+  <div class="card">
+    <div class="ct">📋 Student Score Details</div>
+    <div style="overflow-x:auto">
+      <table class="tbl" id="screp-tbl"></table>
+    </div>
+  </div>
+  <div class="brow">
+    <button class="btn btn-g" id="btn-print-scores">🖨 Print</button>
+    <button class="btn btn-o" id="btn-exp-screp">📥 Export CSV</button>
+  </div>
+</div>
+
+<!-- CLO REPORT -->
+<div class="pg" id="pg-clor">
+  <div class="rh"><h2>📈 CLO Achievement Report</h2><p id="clor-sub"></p></div>
+  <div class="ptabs">
+    <button class="ptab on" id="ptab-sum">Summary</button>
+    <button class="ptab" id="ptab-det">Student Detail</button>
+  </div>
+  <div class="psec on" id="ps-sum">
+    <div class="g3">
+      <div class="card" style="border-top:3px solid var(--k)"><div class="ct" style="color:var(--k)">🧠 Knowledge</div><div id="cr-K"></div></div>
+      <div class="card" style="border-top:3px solid var(--s)"><div class="ct" style="color:var(--s)">⚙️ Skill</div><div id="cr-S"></div></div>
+      <div class="card" style="border-top:3px solid var(--v)"><div class="ct" style="color:var(--v)">💎 Value</div><div id="cr-V"></div></div>
+    </div>
+    <div class="card"><div class="ct">📊 Weights & Achievement Summary</div><div style="overflow-x:auto"><table class="tbl" id="clo-sum-tbl"></table></div></div>
+  </div>
+  <div class="psec" id="ps-det">
+    <div class="card"><div class="ct">📋 Student Scores per CLO</div><div style="overflow-x:auto"><table class="tbl" id="clor-tbl"></table></div></div>
+  </div>
+  <div class="brow"><button class="btn btn-g" id="btn-print-clo">🖨 Print</button><button class="btn btn-o" id="btn-exp-clor">📥 CSV</button></div>
+</div>
+
+<!-- PLO REPORT -->
+<div class="pg" id="pg-plor">
+  <div class="rh"><h2>🔗 Program Learning Outcomes Report (PLO)</h2><p id="plor-sub"></p></div>
+  <div class="card"><div class="ct">📊 PLO Achievement Rates</div><div id="plo-ach"></div></div>
+  <div class="card"><div class="ct">🔗 CLO × PLO Matrix</div><div style="overflow-x:auto"><table class="tbl" id="plo-mx-tbl"></table></div></div>
+  <div class="brow">
+    <button class="btn btn-g" id="btn-print-plo">🖨 Print</button>
+    <button class="btn btn-o" id="btn-exp-plor">📥 Export CSV</button>
+  </div>
+</div>
+
+
+<!-- FINAL REPORT -->
+<div class="pg" id="pg-finr">
+  <div class="rh"><h2>📄 Final Results</h2><p id="finr-sub"></p></div>
+  <div class="mgrid">
+    <div class="met bl"><div class="mv" id="fr-t">0</div><div class="ml">Students</div></div>
+    <div class="met gr"><div class="mv" id="fr-p">—</div><div class="ml">Passed</div></div>
+    <div class="met pu"><div class="mv" id="fr-f">—</div><div class="ml">Failed</div></div>
+    <div class="met go"><div class="mv" id="fr-a">—</div><div class="ml">Average</div></div>
+  </div>
+  <div class="card"><div class="ct">📊 Details</div><div style="overflow-x:auto"><table class="tbl" id="finr-tbl"></table></div></div>
+  <div class="brow"><button class="btn btn-g" id="btn-print-finr">🖨 Print</button><button class="btn btn-o" id="btn-exp-finr">📥 CSV</button></div>
+</div>
+
+<!-- GRADES -->
+<div class="pg" id="pg-grd">
+  <div class="card"><div class="ct">🏆 Grade Distribution</div><div id="grd-cells" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px"></div><canvas id="grd-cv" height="90"></canvas></div>
+  <div class="card"><div class="ct">📈 Statistics</div><div id="grd-stats" class="mgrid"></div></div>
+  <div class="brow">
+    <button class="btn btn-g" id="btn-print-grd">🖨 Print</button>
+  </div>
+</div>
+
+<!-- OFFICIAL CARD -->
+<div class="pg" id="pg-report">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:8px">
+    <div style="font-size:14px;font-weight:700;color:var(--pr)">📑 Official Course Card</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-g" id="btn-print-report">🖨 Print / PDF</button>
+    </div>
+  </div>
+<!-- COURSE REPORT PAGE -->
+<div class="pg" id="pg-coursereport">
+  <div class="rh">
+    <h2>📄 Course Report</h2>
+    <p>Generate a complete course report with manual data entry</p>
+  </div>
+  <div class="card">
+    <div class="ct">📋 Generate Course Report</div>
+    <p style="font-size:13px;color:var(--mu);margin-bottom:1rem">The report will include CLO/PLO achievement data plus your manual entries (comments, recommendations, topics not covered, improvement plan).</p>
+    <button class="btn btn-p" id="btn-open-report-modal" style="font-size:14px;padding:10px 24px">📄 Create Course Report</button>
+  </div>
+</div>
+  <div id="official-report-card" style="background:#fff;border:1px solid var(--bd);border-radius:var(--rl);max-width:820px;margin:0 auto;overflow:hidden;font-family:Cairo,sans-serif">
+    <!-- Header -->
+    <div style="background:var(--pr);padding:1.2rem 1.5rem">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem">
+        <div style="width:80px;height:80px;border:2px dashed rgba(255,255,255,.4);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <div style="text-align:center;color:rgba(255,255,255,.6);font-size:10px;line-height:1.5">University<br>Logo</div>
+        </div>
+        <div style="flex:1;text-align:center;color:#fff">
+          <div style="font-size:18px;font-weight:800;margin-bottom:3px">Najran University</div>
+          <div style="font-size:13px;opacity:.85">College of Science &amp; Arts — Dept. of Mathematics</div>
+        </div>
+        <div style="width:80px;text-align:center;color:var(--go);font-size:10px;font-weight:700;line-height:1.5;flex-shrink:0">CLO<br>Measurement<br>System</div>
+      </div>
+    </div>
+    <div style="height:4px;background:var(--go)"></div>
+    <!-- Course Info -->
+    <div style="padding:1rem 1.5rem;background:#f8f9ff;border-bottom:1px solid var(--bd)">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 24px;font-size:13px;direction:ltr">
+        <div><span style="color:var(--mu);font-weight:600">Course Title: </span><strong id="rpt-name" style="color:var(--pr)">—</strong></div>
+        <div><span style="color:var(--mu);font-weight:600">Course Code: </span><strong id="rpt-code">—</strong></div>
+        <div><span style="color:var(--mu);font-weight:600">Academic Year: </span><span id="rpt-year">—</span></div>
+        <div><span style="color:var(--mu);font-weight:600">Semester: </span><span id="rpt-sem">—</span></div>
+        <div><span style="color:var(--mu);font-weight:600">Section: </span><span id="rpt-sec">—</span></div>
+        <div><span style="color:var(--mu);font-weight:600">Credit Hours: </span><span id="rpt-cr">—</span></div>
+        <div><span style="color:var(--mu);font-weight:600">No. of Students: </span><span id="rpt-nstu">—</span></div>
+        <div><span style="color:var(--mu);font-weight:600">Instructor: </span><span id="rpt-inst">—</span></div>
+      </div>
+    </div>
+    <div style="padding:1rem 1.5rem;display:flex;flex-direction:column;gap:1.2rem">
+      <!-- CLO Summary -->
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--pr);margin-bottom:8px;padding-bottom:5px;border-bottom:2px solid var(--go);direction:ltr">📋 Course Outcomes (CLOs) — Achievement Rates</div>
+        <table style="width:100%;border-collapse:collapse;font-size:12px;direction:ltr">
+          <thead><tr style="background:var(--pr);color:#fff">
+            <th style="padding:6px 10px;text-align:right;border:1px solid #ccc">Outcome</th>
+            <th style="padding:6px 10px;text-align:right;border:1px solid #ccc">Description</th>
+            <th style="padding:6px 10px;text-align:center;border:1px solid #ccc">Type</th>
+            <th style="padding:6px 10px;text-align:center;border:1px solid #ccc">PLO</th>
+            <th style="padding:6px 10px;text-align:center;border:1px solid #ccc">Achievement %</th>
+            <th style="padding:6px 10px;text-align:center;border:1px solid #ccc">Target</th>
+            <th style="padding:6px 10px;text-align:center;border:1px solid #ccc">Status</th>
+          </tr></thead>
+          <tbody id="rpt-clo-body"></tbody>
+        </table>
+      </div>
+      <!-- PLO Summary -->
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--pr);margin-bottom:8px;padding-bottom:5px;border-bottom:2px solid var(--go);direction:ltr">🔗 Program Outcomes (PLOs) — Achievement Rates</div>
+        <table style="width:100%;border-collapse:collapse;font-size:12px;direction:ltr">
+          <thead><tr style="background:var(--pr);color:#fff">
+            <th style="padding:6px 10px;text-align:right;border:1px solid #ccc">PLO</th>
+            <th style="padding:6px 10px;text-align:right;border:1px solid #ccc">Description</th>
+            <th style="padding:6px 10px;text-align:center;border:1px solid #ccc">Achievement %</th>
+            <th style="padding:6px 10px;text-align:center;border:1px solid #ccc">Status</th>
+          </tr></thead>
+          <tbody id="rpt-plo-body"></tbody>
+        </table>
+      </div>
+      <!-- Grades -->
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--pr);margin-bottom:8px;padding-bottom:5px;border-bottom:2px solid var(--go);direction:ltr">🏆 Results Summary &amp; Grade Distribution</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px" id="rpt-stats"></div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap" id="rpt-grades"></div>
+      </div>
+      <!-- Signature -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:.5rem;direction:ltr">
+        <div style="text-align:center;border-top:1px solid var(--bd);padding-top:8px">
+          <div style="font-size:11px;color:var(--mu);margin-bottom:3px">Instructor</div>
+          <div style="font-size:12px;font-weight:700" id="rpt-sign-inst">—</div>
+          <div style="height:36px"></div>
+          <div style="border-top:1px solid var(--bd);font-size:10px;color:var(--mu);padding-top:4px">Signature</div>
+        </div>
+        <div style="text-align:center;border-top:1px solid var(--bd);padding-top:8px">
+
+          <div style="height:36px"></div>
+        </div>
+        <div style="text-align:center;border-top:1px solid var(--bd);padding-top:8px">
+          <div style="font-size:11px;color:var(--mu);margin-bottom:3px">Report Date</div>
+          <div style="font-size:12px;font-weight:700" id="rpt-date">—</div>
+          <div style="height:36px"></div>
+
+        </div>
+      </div>
+      <div style="text-align:center;font-size:10px;color:var(--mu);border-top:1px solid var(--bd);padding-top:8px;direction:ltr">
+        CLO Measurement System — Najran University — College of Science &amp; Arts — Dept. of Mathematics &nbsp;|&nbsp; Dr. Rashad Al-Jawfi
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BACKUP -->
+<div class="pg" id="pg-set">
+  <div class="card">
+    <div class="ct">📦 Save &amp; Restore Data</div>
+    <div class="brow">
+      <button class="btn btn-g" id="btn-exp-json">📥 Export JSON</button>
+      <button class="btn btn-o" id="btn-imp-json">📤 Import JSON</button>
+      <input type="file" id="imp-file" accept=".json" style="display:none">
+      <button class="btn btn-r" id="btn-clr-all">🗑 Clear All Data</button>
+    </div>
+    <p style="font-size:12px;color:var(--mu);margin-top:10px">💡 Data is saved automatically in the browser on every change.</p>
+  </div>
+</div>
+
+</div></div>
+
+<!-- MODAL CLO -->
+<div class="mo" id="mo-clo">
+  <div class="mo-box">
+    <button class="mo-x" id="mo-clo-x">✕</button>
+    <div class="mo-title">✏️ Edit Course Outcome</div>
+    <input type="hidden" id="ec-i">
+    <div class="g2"><div class="fg"><label class="lbl">Code</label><input type="text" class="fc" id="ec-code"></div><div class="fg"><label class="lbl">Type</label><select class="fc" id="ec-type"><option value="K">🧠 Knowledge</option><option value="S">⚙️ Skill</option><option value="V">💎 Value</option></select></div></div>
+    <div class="fg"><label class="lbl">Description</label><textarea class="fc" id="ec-desc"></textarea></div>
+    <div class="g3"><div class="fg"><label class="lbl">Bloom's</label><select class="fc" id="ec-bloom"><option>Remembering</option><option>Understanding</option><option>Applying</option><option>Analyzing</option><option>Evaluating</option><option>Creating</option></select></div><div class="fg"><label class="lbl">Pass Rate %</label><input type="text" class="fc" id="ec-pass"></div><div class="fg"><label class="lbl">PLO</label><select class="fc" id="ec-plo"><option value="">—</option></select></div></div>
+    <div class="fg">
+      <label class="lbl">📋 Assessment Methods</label>
+      <textarea id="ec-assessment-methods" class="fc" rows="2" placeholder="Assessment methods for this CLO..."></textarea>
+    </div>
+    <div class="brow"><button class="btn btn-p" id="btn-save-ec">💾 Save</button><button class="btn btn-o" id="btn-cancel-ec">Cancel</button></div>
+  </div>
+</div>
+
+<!-- MODAL PLO -->
+<div class="mo" id="mo-plo">
+  <div class="mo-box">
+    <button class="mo-x" id="mo-plo-x">✕</button>
+    <div class="mo-title">✏️ Edit Program Outcome</div>
+    <input type="hidden" id="ep-i">
+    <div class="g2"><div class="fg"><label class="lbl">Code</label><input type="text" class="fc" id="ep-code"></div><div class="fg"><label class="lbl">Type</label><select class="fc" id="ep-type"><option value="K">🧠 Knowledge</option><option value="S">⚙️ Skill</option><option value="V">💎 Value</option></select></div></div>
+    <div class="fg"><label class="lbl">Description</label><textarea class="fc" id="ep-desc"></textarea></div>
+    <div class="brow"><button class="btn btn-p" id="btn-save-ep">💾 Save</button><button class="btn btn-o" id="btn-cancel-ep">Cancel</button></div>
+  </div>
+</div>
+
+<!-- MODAL COURSE REPORT -->
+<!-- MODAL COURSE REPORT -->
+<div class="mo" id="mo-course-report">
+  <div class="mo-box" style="width:600px;max-width:90vw">
+    <button class="mo-x" id="mo-cr-x">✕</button>
+    <div class="mo-title">📄 Course Report - Manual Data Entry</div>
+    
+    <div class="fg" style="margin-bottom:16px">
+      <label class="lbl">📝 Comment on Student Grades</label>
+      <textarea id="cr-comment-grades" class="fc" rows="3" placeholder="Write your comments on student performance..."></textarea>
+    </div>
+
+    <div class="fg" style="margin-bottom:16px">
+      <label class="lbl">💡 Recommendations</label>
+      <textarea id="cr-recommendations" class="fc" rows="4" placeholder="Enter recommendations for course improvement..."></textarea>
+    </div>
+
+    <div class="fg" style="margin-bottom:16px">
+      <label class="lbl">❌ Topics Not Covered</label>
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead>
+          <tr><th style="border:1px solid #ccc;padding:6px;background:var(--pr);color:#fff">Topic</th>
+            <th style="border:1px solid #ccc;padding:6px;background:var(--pr);color:#fff">Reason</th>
+            <th style="border:1px solid #ccc;padding:6px;background:var(--pr);color:#fff">Impact</th>
+            <th style="border:1px solid #ccc;padding:6px;background:var(--pr);color:#fff">Compensating Action</th>
+           </tr>
+        </thead>
+        <tbody id="cr-topics-body">
+          <tr>
+            <td style="border:1px solid #ccc;padding:4px"><input type="text" class="fc" style="width:100%" placeholder="Topic name"></td>
+            <td style="border:1px solid #ccc;padding:4px"><input type="text" class="fc" style="width:100%" placeholder="Reason"></td>
+            <td style="border:1px solid #ccc;padding:4px"><select class="fc" style="width:100%"><option value="">—</option><option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option></select></td>
+            <td style="border:1px solid #ccc;padding:4px"><input type="text" class="fc" style="width:100%" placeholder="Compensating action"></td>
+          </tr>
+        </tbody>
+      </table>
+      <button type="button" id="btn-cr-add-topic" style="margin-top:8px;background:var(--go);color:#fff;border:none;border-radius:6px;padding:5px 12px;cursor:pointer">+ Add Topic</button>
+    </div>
+
+    <div class="fg" style="margin-bottom:16px">
+      <label class="lbl">📈 Course Improvement Plan</label>
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead>
+          <tr><th style="border:1px solid #ccc;padding:6px;background:var(--pr);color:#fff">Recommendations</th>
+            <th style="border:1px solid #ccc;padding:6px;background:var(--pr);color:#fff">Actions</th>
+            <th style="border:1px solid #ccc;padding:6px;background:var(--pr);color:#fff">Needed Support</th>
+           </tr>
+        </thead>
+        <tbody id="cr-plan-body">
+          <tr>
+            <td style="border:1px solid #ccc;padding:4px"><input type="text" class="fc" style="width:100%" placeholder="Recommendation"></td>
+            <td style="border:1px solid #ccc;padding:4px"><input type="text" class="fc" style="width:100%" placeholder="Actions"></td>
+            <td style="border:1px solid #ccc;padding:4px"><input type="text" class="fc" style="width:100%" placeholder="Needed support"></td>
+          </tr>
+        </tbody>
+      </table>
+      <button type="button" id="btn-cr-add-plan" style="margin-top:8px;background:var(--go);color:#fff;border:none;border-radius:6px;padding:5px 12px;cursor:pointer">+ Add Item</button>
+    </div>
+
+    <div class="brow" style="margin-top:20px;gap:12px">
+      <button class="btn btn-p" id="btn-cr-print-pdf" style="background:#c0392b">🖨️ Print Report / Save as PDF</button>
+      <button class="btn btn-o" id="btn-cr-cancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+
+// ═══════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════
+var D = {"info": {"year": "", "sem": "", "name": "", "c1": "", "c2": "", "c3": "", "sec": "", "cr": "", "nstu": "", "inst": "", "started": "", "denied": "", "withdrawn": "", "incomplete": ""}, "students": [], "plos": [{"code": "PLO-K1", "type": "K", "desc": "Demonstrate knowledge of facts and basic concepts in Mathematics and Statistics."}, {"code": "PLO-S1", "type": "S", "desc": "Solve pure and applied mathematical problems."}, {"code": "PLO-S2", "type": "S", "desc": "Formulate mathematical proofs clearly and explicitly."}, {"code": "PLO-S3", "type": "S", "desc": "Combine multiple mathematical techniques to solve mathematical problems."}, {"code": "PLO-S4", "type": "S", "desc": "Present mathematical ideas clearly, both orally and in writing."}, {"code": "PLO-S5", "type": "S", "desc": "Use specialized mathematical software to solve various problems."}, {"code": "PLO-V1", "type": "V", "desc": "Work in a team, take responsibility and commit to community values."}, {"code": "PLO-V2", "type": "V", "desc": "Autonomy and continuous self-learning."}], "clos": [], "assessments": [{"id": "qz", "label": "Quizzes", "icon": "📝", "exams": [{"name": "Quiz 1", "qcount": 5, "mx": {}, "scores": {}}, {"name": "Quiz 2", "qcount": 5, "mx": {}, "scores": {}}, {"name": "Quiz 3", "qcount": 5, "mx": {}, "scores": {}}, {"name": "Quiz 4", "qcount": 5, "mx": {}, "scores": {}}]}, {"id": "as", "label": "Assignments", "icon": "📄", "exams": [{"name": "Assignment 1", "qcount": 5, "mx": {}, "scores": {}}, {"name": "Assignment 2", "qcount": 5, "mx": {}, "scores": {}}, {"name": "Assignment 3", "qcount": 5, "mx": {}, "scores": {}}, {"name": "Assignment 4", "qcount": 5, "mx": {}, "scores": {}}]}, {"id": "mt", "label": "Midterm Exams", "icon": "📑", "exams": [{"name": "Mid Term Exam I", "qcount": 5, "mx": {}, "scores": {}}, {"name": "Mid Term Exam II", "qcount": 5, "mx": {}, "scores": {}}]}, {"id": "fe", "label": "Final Exam", "icon": "🏁", "exams": [{"name": "Final Exam", "qcount": 5, "mx": {}, "scores": {}}]}, {"id": "lb", "label": "Labs", "icon": "🔬", "exams": [{"name": "Mid Lab Exam", "qcount": 5, "mx": {}, "scores": {}}, {"name": "Final Lab Exam", "qcount": 5, "mx": {}, "scores": {}}]}, {"id": "act", "label": "Other Activities", "icon": "🎯", "exams": [{"name": "Activity 1", "qcount": 3, "mx": {}, "scores": {}}, {"name": "Activity 2", "qcount": 3, "mx": {}, "scores": {}}, {"name": "Activity 3", "qcount": 3, "mx": {}, "scores": {}}, {"name": "Activity 4", "qcount": 3, "mx": {}, "scores": {}}]}], "activeExam": {"qz": 0, "as": 0, "mt": 0, "fe": 0, "lb": 0, "act": 0}};
+
+// ═══════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════
+var BLC={Remembering:"#378ADD",Understanding:"#1D9E75",Applying:"#7F77DD",Analyzing:"#EF9F27",Evaluating:"#D4537E",Creating:"#D85A30"};
+var TYL={K:"Knowledge",S:"Skill",V:"Value"};
+var GCL={"A+":"#1a7a4a","A":"#2a9a5a","B+":"#3aaa6a","B":"#4aba7a","C+":"#C9A84C","C":"#d0a030","D+":"#c05a00","D":"#d07000","F":"#c0392b"};
+
+function ge(id){return document.getElementById(id);}
+function gfn(t){if(t>=95)return"A+";if(t>=90)return"A";if(t>=85)return"B+";if(t>=80)return"B";if(t>=75)return"C+";if(t>=70)return"C";if(t>=65)return"D+";if(t>=60)return"D";return"F";}
+function bc(p,pass){return p>=80?"#1a7a4a":p>=pass?"#C9A84C":"#c0392b";}
+function bdg(p,pass){
+  if(p===null||p===undefined)return'<span class="bb b-na">No data</span>';
+  if(p>=80)return'<span class="bb b-ok">Excellent ✅</span>';
+  if(p>=pass)return'<span class="bb b-wn">Acceptable ⚠</span>';
+  return'<span class="bb b-er">Below Level ❌</span>';
+}
+function ttag(t){return'<span class="tb'+t+'">'+TYL[t]+'</span>';}
+function toast(m){var el=ge("toast");el.textContent=m;el.classList.add("show");setTimeout(function(){el.classList.remove("show");},2400);}
+function openMo(id){ge(id).classList.add("on");}
+function closeMo(id){ge(id).classList.remove("on");}
+function dl(c,n,t){var b=new Blob([c],{type:t});var a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=n;a.click();}
+function syncCodeParts(val){
+  var parts=val.trim().split("-");
+  if(ge("s-c1"))ge("s-c1").value=parts[0]||"";
+  if(ge("s-c2"))ge("s-c2").value=parts[1]||"";
+  if(ge("s-c3"))ge("s-c3").value=parts[2]||"";
+}
+var STORE_KEY="my_clo_system_data";
+
+function saveD(){try{localStorage.setItem(STORE_KEY,JSON.stringify(D));}catch(e){}}
+function loadD(){try{var x=localStorage.getItem(STORE_KEY);if(x)D=JSON.parse(x);}catch(e){}}
+
+function getCode(){
+  var c1=ge("s-c1")?ge("s-c1").value.trim():"";
+  var c2=ge("s-c2")?ge("s-c2").value.trim():"";
+  var c3=ge("s-c3")?ge("s-c3").value.trim():"";
+  return [c1,c2,c3].filter(Boolean).join("-");
+}
+
+function updateInfoCard(){
+  document.title = (D.info.name || "Course") + " — CLO Measurement System";
+  var info=D.info;
+  var code=[info.c1,info.c2,info.c3].filter(Boolean).join("-");
+  ge("i-year").textContent=info.year||"—";
+  ge("i-sem").textContent=info.sem||"—";
+  ge("i-name").textContent=info.name||"—";
+  ge("i-code").textContent=code||"—";
+  ge("i-sec").textContent=info.sec||"—";
+  ge("i-cr").textContent=info.cr||"—";
+  ge("i-nstu").textContent=D.students.length||info.nstu||"—";
+  ge("i-inst").textContent=info.inst||"—";
+  ge("hdr-name").textContent=info.name||"Course";
+}
+
+function getAssess(aid){return D.assessments.find(function(a){return a.id===aid;});}
+
+function stuCLOpct(si,cloCode){
+  var totalMax=0,totalEarned=0;
+  D.assessments.forEach(function(aconf){
+    aconf.exams.forEach(function(ex){
+      var mx=ex.mx||{};
+      var cloMx=mx[cloCode]||{};
+      var qcount=ex.qcount||0;
+      for(var qn=1;qn<=qcount;qn++){
+        var w=parseFloat(cloMx[String(qn)])||0;
+        if(w>0){
+          totalMax+=w;
+          var sc=(ex.scores&&ex.scores[si])?ex.scores[si]:{};
+          var earned=parseFloat(sc[String(qn)])||0;
+          totalEarned+=Math.min(earned,w);
+        }
+      }
+    });
+  });
+  return totalMax>0?Math.round(totalEarned/totalMax*100):null;
+}
+
+function cloAchPct(clo){
+  var pcts=[];
+  D.students.forEach(function(_,i){var p=stuCLOpct(i,clo.code);if(p!==null)pcts.push(p);});
+  if(!pcts.length)return null;
+  return Math.round(pcts.filter(function(v){return v>=clo.pass;}).length/pcts.length*100);
+}
+
+function stuTotal(si){
+  var totalMax=0,totalEarned=0;
+  D.assessments.forEach(function(aconf){
+    aconf.exams.forEach(function(ex){
+      var mx=ex.mx||{};
+      var qcount=ex.qcount||0;
+      for(var qn=1;qn<=qcount;qn++){
+        var qMax=0;
+        D.clos.forEach(function(c){qMax+=parseFloat((mx[c.code]||{})[String(qn)])||0;});
+        if(qMax>0){
+          totalMax+=qMax;
+          var sc=(ex.scores&&ex.scores[si])?ex.scores[si]:{};
+          totalEarned+=Math.min(parseFloat(sc[String(qn)])||0,qMax);
+        }
+      }
+    });
+  });
+  return totalMax>0?Math.round(totalEarned/totalMax*100):null;
+}
+
+function renderReport(){
+  var info=D.info;
+  var code=[info.c1,info.c2,info.c3].filter(Boolean).join("-");
+  ge("rpt-name").textContent=info.name||"—";
+  ge("rpt-code").textContent=code||"—";
+  ge("rpt-year").textContent=info.year||"—";
+  ge("rpt-sem").textContent=info.sem||"—";
+  ge("rpt-sec").textContent=info.sec||"—";
+  ge("rpt-cr").textContent=info.cr||"—";
+  ge("rpt-nstu").textContent=D.students.length||info.nstu||"—";
+  ge("rpt-inst").textContent=info.inst||"—";
+  ge("rpt-sign-inst").textContent=info.inst||"—";
+  ge("rpt-date").textContent=new Date().toLocaleDateString("en-US");
+  var TYL2={K:"Knowledge",S:"Skill",V:"Value"};
+  var cloRows=D.clos.map(function(c,i){
+    var p=cloAchPct(c);var clr=p!==null?bc(p,c.pass):"var(--mu)";
+    var hk=p===null?"—":p>=80?"Excellent ✅":p>=c.pass?"Acceptable ⚠":"Below Level ❌";
+    var bg=i%2===0?"#f8f9ff":"#fff";
+    return'<tr style="background:'+bg+'">'+
+      '<td style="padding:5px 10px;border:1px solid #ddd;font-weight:700">'+c.code+'</td>'+
+      '<td style="padding:5px 10px;border:1px solid #ddd;font-size:11px">'+c.desc+'</td>'+
+      '<td style="padding:5px 10px;border:1px solid #ddd;text-align:center">'+TYL2[c.type]+'</td>'+
+      '<td style="padding:5px 10px;border:1px solid #ddd;text-align:center">'+( c.plo||"—")+'</td>'+
+      '<td style="padding:5px 10px;border:1px solid #ddd;text-align:center;font-weight:800;color:'+clr+'">'+(p!==null?p+"%":"—")+'</td>'+
+      '<td style="padding:5px 10px;border:1px solid #ddd;text-align:center">'+c.pass+'%</td>'+
+      '<td style="padding:5px 10px;border:1px solid #ddd;text-align:center">'+hk+'</td></tr>';
+  }).join('');
+  ge("rpt-clo-body").innerHTML=cloRows||'<tr><td colspan="7" style="padding:10px;text-align:center;color:var(--mu)">No outcomes found</td></tr>';
+  var ploMap={};D.plos.forEach(function(p){ploMap[p.code]=[];});
+  D.clos.forEach(function(c){if(c.plo&&ploMap[c.plo])ploMap[c.plo].push(c);});
+  var sortedP=D.plos.slice().sort(function(a,b){var o={K:0,S:1,V:2};return o[a.type]!==o[b.type]?o[a.type]-o[b.type]:a.code.localeCompare(b.code);});
+  var ploRows=sortedP.map(function(pl,i){
+    var linked=ploMap[pl.code]||[];
+    var pcts=linked.map(cloAchPct).filter(function(p){return p!==null;});
+    var avg=pcts.length?Math.round(pcts.reduce(function(a,b){return a+b;},0)/pcts.length):null;
+    var clr=avg!==null?bc(avg,70):"var(--mu)";
+    var hk=avg===null?"—":avg>=80?"Excellent ✅":avg>=70?"Acceptable ⚠":"Below Level ❌";
+    var bg=i%2===0?"#f8f9ff":"#fff";
+    return'<tr style="background:'+bg+'">'+
+      '<td style="padding:5px 10px;border:1px solid #ddd;font-weight:700">'+pl.code+'</td>'+
+      '<td style="padding:5px 10px;border:1px solid #ddd;font-size:11px">'+pl.desc+'</td>'+
+      '<td style="padding:5px 10px;border:1px solid #ddd;text-align:center;font-weight:800;color:'+clr+'">'+(avg!==null?avg+"%":"—")+'</td>'+
+      '<td style="padding:5px 10px;border:1px solid #ddd;text-align:center">'+hk+'</td></tr>';
+  }).join('');
+  ge("rpt-plo-body").innerHTML=ploRows||'<tr><td colspan="4" style="padding:10px;text-align:center;color:var(--mu)">No PLOs found</td></tr>';
+  var tots=D.students.map(function(_,i){return stuTotal(i);});
+  var valid=tots.filter(function(v){return v!==null;});
+  var avg2=valid.length?Math.round(valid.reduce(function(a,b){return a+b;},0)/valid.length):null;
+  var passing=valid.filter(function(v){return v>=60;}).length;
+  var achCLOs=D.clos.filter(function(c){var p=cloAchPct(c);return p!==null&&p>=c.pass;}).length;
+  ge("rpt-stats").innerHTML=[
+    {l:"Students",v:D.students.length,c:"var(--pr)"},
+    {l:"Average",v:avg2!==null?avg2+"%":"—",c:avg2!==null?bc(avg2,60):"var(--mu)"},
+    {l:"Passed",v:passing+"/"+valid.length,c:"var(--ok)"},
+    {l:"CLOs Achieved",v:achCLOs+"/"+D.clos.length,c:"var(--pr)"},
+  ].map(function(x){
+    return'<div style="background:var(--prxl);border-radius:8px;padding:8px;text-align:center;border-top:3px solid '+x.c+'">'+
+      '<div style="font-size:18px;font-weight:800;color:'+x.c+'">'+x.v+'</div>'+
+      '<div style="font-size:10px;color:var(--mu);margin-top:2px">'+x.l+'</div></div>';
+  }).join('');
+  var GCL2={"أ+":"#1a7a4a","أ":"#2a9a5a","ب+":"#3aaa6a","ب":"#4aba7a","ج+":"#C9A84C","ج":"#d0a030","د+":"#c05a00","د":"#d07000","هـ":"#c0392b"};
+  var gn=["A+","A","B+","B","C+","C","D+","D","F"];
+  var cnt={};gn.forEach(function(g){cnt[g]=0;});
+  valid.forEach(function(t){cnt[gfn(t)]++;});
+  ge("rpt-grades").innerHTML=gn.map(function(g){
+    return'<div style="flex:1;min-width:44px;background:#f5f5f5;border-radius:6px;padding:6px;text-align:center;border-top:3px solid '+GCL2[g]+'">'+
+      '<div style="font-size:10px;color:var(--mu)">'+g+'</div>'+
+      '<div style="font-size:16px;font-weight:800;color:'+GCL2[g]+'">'+cnt[g]+'</div>'+
+      '<div style="font-size:9px;color:var(--mu)">'+(valid.length?Math.round(cnt[g]/valid.length*100)+"%":"0%")+'</div></div>';
+  }).join('');
+}
+
+// ==============================================
+// NAVIGATION
+// ==============================================
+var PAGES=["ov","info","stus","plos","clos","qz","as","mt","fe","lb","act","screp","clor","plor","finr","grd","report","coursereport","set"];
+var cloFilt="all";
+
+function navTo(id){
+  PAGES.forEach(function(p){
+    ge("pg-"+p).classList.remove("on");
+    var n=ge("nv-"+p);if(n)n.classList.remove("on");
+  });
+  ge("pg-"+id).classList.add("on");
+  var nv=ge("nv-"+id);if(nv)nv.classList.add("on");
+  var map={ov:renderOv,info:renderInfo,stus:renderStus,plos:renderPLOs,clos:renderCLOs,
+    qz:function(){renderAssess("qz");},as:function(){renderAssess("as");},
+    mt:function(){renderAssess("mt");},fe:function(){renderAssess("fe");},
+    lb:function(){renderAssess("lb");},
+    act:function(){renderAssess("act");},
+    report:renderReport,
+    screp:renderScoresReport,
+    clor:renderCLOR,plor:renderPLOR,finr:renderFINR,grd:renderGRD};
+  if(map[id])map[id]();
+  
+  // تمرير تلقائي لصفحة تقرير المقرر
+  if(id === "coursereport"){
+    setTimeout(function(){
+      var card = document.querySelector("#pg-coursereport .card");
+      if(card) card.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 100);
+  }
+}
+
+function renderOv(){
+  updateInfoCard();
+  ge("m-stu").textContent=D.students.length;
+  ge("m-clo").textContent=D.clos.length;
+  var allP=D.clos.map(cloAchPct).filter(function(p){return p!==null;});
+  ge("m-avg").textContent=allP.length?Math.round(allP.reduce(function(a,b){return a+b;},0)/allP.length)+"%":"—";
+  var ach=D.clos.filter(function(c){var p=cloAchPct(c);return p!==null&&p>=c.pass;}).length;
+  ge("m-ach").textContent=D.clos.length?ach+"/"+D.clos.length:"—";
+  ["K","S","V"].forEach(function(t){
+    var el=ge("ov-"+t);
+    var list=D.clos.filter(function(c){return c.type===t;});
+    if(!list.length){el.innerHTML='<p style="color:var(--mu);font-size:12px;padding:5px">No outcomes found</p>';return;}
+    el.innerHTML=list.map(function(c){
+      var p=cloAchPct(c);var pv=p!==null?p:0;
+      return'<div class="row"><span class="rcode">'+c.code+'</span><span class="rdesc">'+c.desc.substring(0,28)+'…</span>'+
+        '<div class="bw"><div class="bf" style="width:'+pv+'%;background:'+bc(pv,c.pass)+'"></div></div>'+
+        '<span class="bpct" style="color:'+bc(pv,c.pass)+'">'+(p!==null?p+"%":"—")+'</span></div>';
+    }).join('');
+  });
+  var tots=D.students.map(function(_,i){return stuTotal(i);}).filter(function(v){return v!==null;});
+  var m=tots.filter(function(v){return v>=80;}).length;
+  var pp=tots.filter(function(v){return v>=60&&v<80;}).length;
+  var n=tots.filter(function(v){return v<60;}).length;
+  ge("l-m").textContent=m;ge("l-p").textContent=pp;ge("l-n").textContent=n;
+  drawDonut(m,pp,n,tots.length||1);
+}
+
+function drawDonut(m,p,n,tot){
+  var cv=ge("donut");if(!cv)return;
+  var ctx=cv.getContext("2d");
+  var data=[m/tot,p/tot,n/tot],cols=["#1a7a4a","#C9A84C","#c0392b"];
+  var st=-Math.PI/2;ctx.clearRect(0,0,120,120);
+  data.forEach(function(d,i){if(!d)return;var e=st+d*2*Math.PI;ctx.beginPath();ctx.moveTo(60,60);ctx.arc(60,60,54,st,e);ctx.closePath();ctx.fillStyle=cols[i];ctx.fill();st=e;});
+  ctx.beginPath();ctx.arc(60,60,30,0,2*Math.PI);ctx.fillStyle="#fff";ctx.fill();
+  ctx.fillStyle="#18273a";ctx.font="bold 14px Cairo";ctx.textAlign="center";ctx.textBaseline="middle";
+  ctx.fillText(tot,60,55);ctx.font="10px Cairo";ctx.fillStyle="#5a6a7a";ctx.fillText("students",60,70);
+}
+
+function renderInfo(){
+  var info=D.info;
+  ge("s-year").value=info.year||"";ge("s-sem").value=info.sem||"";ge("s-name").value=info.name||"";
+  var codeVal=[info.c1,info.c2,info.c3].filter(Boolean).join("-");
+  var cf=ge("s-code-full");if(cf)cf.value=codeVal;
+  ge("s-sec").value=info.sec||"";ge("s-cr").value=info.cr||"";
+  ge("s-nstu").value=D.students.length||info.nstu||"";
+  ge("s-inst").value=info.inst||"";
+    ge("s-started").value = info.started || "";
+    ge("s-denied").value = info.denied || "";
+    ge("s-withdrawn").value = info.withdrawn || "";
+    ge("s-incomplete").value = info.incomplete || "";
+    ge("s-absent").value = info.absent || "";
+}
+function renderStus(){
+  ge("stu-cnt").textContent=D.students.length;
+  ge("stu-body").innerHTML=D.students.length?D.students.map(function(s,i){
+    return'<tr><td style="color:var(--mu)">'+(i+1)+'</td>'+
+      '<td style="font-size:11.5px;direction:ltr;text-align:right">'+(s.id||"—")+'</td>'+
+      '<td class="nc">'+s.name+'</td>'+
+      '<td><button class="btn btn-r btn-sm" data-act="del-stu" data-i="'+i+'">🗑</button></td></tr>';
+  }).join(''):'<tr><td colspan="4" style="text-align:center;color:var(--mu);padding:1.2rem">No students found</td></tr>';
+}
+
+function sortedPLOs(){
+  return D.plos.slice().sort(function(a,b){
+    var o={K:0,S:1,V:2};
+    return o[a.type]!==o[b.type]?o[a.type]-o[b.type]:a.code.localeCompare(b.code);
+  });
+}
+function renderPLOs(){
+  var linked={};D.clos.forEach(function(c){if(c.plo){if(!linked[c.plo])linked[c.plo]=[];linked[c.plo].push(c);}});
+  ge("plo-list").innerHTML=sortedPLOs().map(function(p){
+    var i=D.plos.indexOf(p);
+    var lk=(linked[p.code]||[]).map(function(c){return'<span class="rcode" style="margin:1px;display:inline-block">'+c.code+'</span>';}).join('');
+    return'<div class="row"><span class="rcode">'+p.code+'</span>'+ttag(p.type)+
+      '<div class="rdesc"><div style="font-weight:600">'+p.desc+'</div>'+(lk?'<div style="margin-top:3px">'+lk+'</div>':'<div style="font-size:11px;color:var(--mu)">No CLOs linked</div>')+'</div>'+
+      '<button class="btn btn-e btn-sm" data-act="edit-plo" data-i="'+i+'">✏️</button>'+
+      '<button class="btn btn-r btn-sm" data-act="del-plo" data-i="'+i+'">🗑</button></div>';
+  }).join('')||'<p style="color:var(--mu);font-size:13px;padding:8px">No program outcomes</p>';
+}
+function updatePLOSel(selId){
+  var sel=ge(selId);if(!sel)return;
+  var cur=sel.value;
+  sel.innerHTML='<option value="">—</option>'+D.plos.map(function(p){return'<option value="'+p.code+'"'+(p.code===cur?' selected':'')+'>'+p.code+' — '+p.desc.substring(0,30)+'</option>';}).join('');
+}
+
+function renderCLOs(){
+  updatePLOSel("nc-plo");
+  var list=cloFilt==="all"?D.clos:D.clos.filter(function(c){return c.type===cloFilt;});
+  ge("clo-list").innerHTML=list.length?list.map(function(c){
+    var i=D.clos.indexOf(c);var p=cloAchPct(c);var pv=p!==null?p:0;
+    return'<div class="row"><span class="rcode">'+c.code+'</span>'+ttag(c.type)+
+      '<div class="rdesc"><div>'+c.desc+'</div>'+
+        '<span class="bloom-tag" style="background:'+(BLC[c.bloom]||"#888")+'">'+c.bloom+'</span>'+
+        (c.plo?'<span style="font-size:11px;color:var(--mu);margin-right:7px">→ '+c.plo+'</span>':'')+
+      '</div>'+
+      '<div style="text-align:center;min-width:62px"><div style="font-size:15px;font-weight:800;color:'+bc(pv,c.pass)+'">'+(p!==null?p+"%":"—")+'</div><div style="font-size:10px;color:var(--mu)">Target:'+c.pass+'%</div></div>'+
+      bdg(p,c.pass)+
+      (c.assessmentMethods ? '<div style="font-size:10px;color:var(--pr);margin-top:4px">📋 ' + escapeHtmlSafe(c.assessmentMethods) + '</div>' : '') +
+      '<button class="btn btn-e btn-sm" data-act="edit-clo" data-i="'+i+'">✏️</button>'+
+      '<button class="btn btn-r btn-sm" data-act="del-clo" data-i="'+i+'">🗑</button></div>';
+  }).join(''):'<p style="color:var(--mu);font-size:13px;padding:8px">No outcomes found</p>';
+}
+
+function renderAssess(aid){
+  var aconf = getAssess(aid);
+  var activeEi = D.activeExam[aid] || 0;
+  var ex = aconf.exams[activeEi];
+  var wrap = ge("pg-"+aid);
+  var mx = ex.mx || {};
+  var qcount = ex.qcount || 5;
+  
+  var html = '<div class="card"><div class="ct">'+aconf.icon+' '+aconf.label+'</div>';
+  
+  // Exam tabs
+  html += '<div class="stabs">';
+  aconf.exams.forEach(function(e, ei){
+    var tabLabel = (aid==="act" && e.actName) ? e.actName : e.name;
+    html += '<button class="stab'+(ei===activeEi?' on':'')+'" data-act="exam-tab" data-aid="'+aid+'" data-ei="'+ei+'">'+tabLabel+'</button>';
+  });
+  html += '</div>';
+  
+  // Activity name field for "act"
+  if(aid==="act"){
+    var actName = ex.actName || "";
+    html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:10px 14px;background:var(--prxl);border-radius:var(--r);border:1.5px solid #b0cce8">';
+    html += '<label style="font-size:13px;font-weight:700;color:var(--pr);white-space:nowrap">🏷️ Activity Name:</label>';
+    html += '<input type="text" id="act-name-'+activeEi+'" value="'+actName+'" placeholder="e.g. Oral Presentation, Research Paper..." style="flex:1;padding:7px 12px;border:1.5px solid var(--bd);border-radius:var(--r);font-family:Cairo,sans-serif;font-size:13px;background:#fff">';
+    html += '<button class="btn btn-p btn-sm" data-act="save-act-name" data-aid="'+aid+'" data-ei="'+activeEi+'">💾 Save</button>';
+    html += '</div>';
+  }
+  
+  // Matrix section
+  html += '<div style="font-size:13px;font-weight:700;color:var(--pr);margin-bottom:8px">🔢 Weight Matrix — CLOs × Questions</div>';
+  html += '<div style="font-size:12px;color:var(--mu);margin-bottom:10px">Enter the max score for each question on that outcome (0 = no link)</div>';
+  html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">';
+  html += '<label style="font-size:12.5px;font-weight:700;color:var(--mu);white-space:nowrap">No. of Questions:</label>';
+html += '<input type="text" inputmode="numeric" pattern="[0-9]*" id="qcount-'+aid+'" value="'+qcount+'" min="1" max="20" style="width:70px;padding:7px;border:1.5px solid var(--bd);border-radius:var(--r);text-align:center">';
+  html += '<button class="btn btn-o btn-sm" data-act="upd-qcount" data-aid="'+aid+'" data-ei="'+activeEi+'">Update</button>';
+  html += '<button class="btn btn-p btn-sm" data-act="save-mx" data-aid="'+aid+'" data-ei="'+activeEi+'">💾 Save Matrix</button></div>';
+  
+  // Matrix table
+  html += '<div class="mx-wrap"><table class="mx-tbl"><thead><tr><th class="cloh">CLO</th>';
+  for(var q=1; q<=qcount; q++) html += '<th class="qh">Q'+q+'</th>';
+  html += '<th class="qh">Total</th></tr></thead><tbody>';
+  
+  D.clos.forEach(function(clo){
+    var cloMx = mx[clo.code] || {};
+    var rowTot = 0;
+    html += '<tr><td class="cln"><span class="rcode">'+clo.code+'</span></td>';
+    for(var q2=1; q2<=qcount; q2++){
+      var val = parseFloat(cloMx[String(q2)]) || 0;
+      if(val > 0) rowTot += val;
+html += '<td><input type="text" inputmode="numeric" pattern="[0-9]*" class="mxi'+(val>0?' hv':'')+'" value="'+(val||'')+'" min="0" step="0.5" placeholder="0" data-aid="'+aid+'" data-ei="'+activeEi+'" data-clo="'+clo.code+'" data-q="'+q2+'"></td>';
+    }
+    html += '<td class="tot">'+(rowTot>0?rowTot:'')+'</td></tr>';
+  });
+  
+  // Column totals
+  html += '<tr style="background:var(--prxl)"><td class="cln" style="font-weight:700">Questions Total</td>';
+  var grand = 0;
+  for(var q3=1; q3<=qcount; q3++){
+    var colTot = 0;
+    D.clos.forEach(function(c){ colTot += parseFloat((mx[c.code]||{})[String(q3)]) || 0; });
+    grand += colTot;
+    html += '<td class="tot">'+(colTot>0?colTot:'')+'</td>';
+  }
+  html += '<td class="tot">'+(grand>0?grand:'')+'</td></tr>';
+  html += '</tbody></table></div>';
+  
+  // Scores section
+  html += '<div style="font-size:13px;font-weight:700;color:var(--pr);margin:18px 0 8px">✏️ Enter Student Scores</div>';
+  
+  if(!D.students.length){
+    html += '<p style="color:var(--wn);font-size:13px;background:var(--wnb);padding:10px;border-radius:var(--r)">⚠ Add students first</p>';
+  } else {
+    // Build question list
+    var qList = [];
+    for(var qn=1; qn<=qcount; qn++){
+      var qClos = [], qMax = 0;
+      D.clos.forEach(function(c){
+        var w = parseFloat((mx[c.code]||{})[String(qn)]) || 0;
+        if(w > 0){ qClos.push(c.code); qMax += w; }
+      });
+      qList.push({n:qn, clos:qClos, max:qMax});
+    }
+    var totalMax = qList.reduce(function(a,q){ return a + q.max; }, 0);
+    
+    html += '<div style="display:flex;gap:8px;margin-bottom:8px">';
+    html += '<button class="btn btn-o btn-sm" data-act="fill-rand" data-aid="'+aid+'" data-ei="'+activeEi+'">🎲 Random Fill</button>';
+    html += '<button class="btn btn-p btn-sm" data-act="save-sc" data-aid="'+aid+'" data-ei="'+activeEi+'">💾 Save Scores</button></div>';
+    
+    html += '<div style="overflow-x:auto"><table class="tbl"><thead>';
+    html += '<tr><th>#</th><th class="nc">Student Name</th>';
+    qList.forEach(function(q){
+      html += '<th class="ch">Q'+q.n+'<br><small style="color:var(--pr)">'+q.clos.join('/')+'</small><br>/'+q.max+'</th>';
+    });
+    html += '<th class="ch">Total<br>/'+totalMax+'</th><th class="ch">%</th></tr></thead><tbody>';
+    
+    var scores = ex.scores || {};
+    
+    // THIS IS THE IMPORTANT PART - Displaying students
+    for(var si = 0; si < D.students.length; si++){
+      var student = D.students[si];
+      var stuSc = scores[String(si)] || {};
+      var tot = 0;
+      
+      // Calculate total for this student
+      for(var qidx = 0; qidx < qList.length; qidx++){
+        var q = qList[qidx];
+        var val = parseFloat(stuSc[String(q.n)]) || 0;
+        tot += val;
+      }
+      var pct = totalMax > 0 ? Math.round(tot / totalMax * 100) : 0;
+      
+      html += '<tr>';
+      html += '<td style="color:var(--mu); text-align:center">' + (si+1) + '</td>';
+      html += '<td class="nc" style="text-align:right; font-weight:500">' + student.name + '</td>';
+      
+      for(var qidx2 = 0; qidx2 < qList.length; qidx2++){
+        var q2 = qList[qidx2];
+        var val2 = stuSc[String(q2.n)] !== undefined ? stuSc[String(q2.n)] : '';
+        var ov = (q2.max > 0 && parseFloat(val2) > q2.max);
+html += '<td style="text-align:center"><input type="text" inputmode="numeric" pattern="[0-9]*" class="si' + (ov ? ' ov' : '') + '" value="' + val2 + '" min="0" max="' + q2.max + '" step="0.5" data-aid="'+aid+'" data-ei="'+activeEi+'" data-si="'+si+'" data-qn="'+q2.n+'"></td>';
+      }
+      
+      html += '<td class="ctr" id="tot-'+si+'" style="font-weight:700; text-align:center">' + tot + '/' + totalMax + '</td>';
+      html += '<td class="ctr" id="pct-'+si+'" style="font-weight:800; color:' + bc(pct,60) + '; text-align:center">' + pct + '%</td>';
+      html += '</tr>';
+    }
+    
+    html += '</tbody></table></div>';
+  }
+  html += '</div>';
+  wrap.innerHTML = html;
+}
+
+
+// ═══════════════════════════════════════════
+// SCORES REPORT
+// ═══════════════════════════════════════════
+function renderScoresReport(){
+  var code=[D.info.c1,D.info.c2,D.info.c3].filter(Boolean).join("-");
+  ge("screp-sub").textContent=(D.info.name||"—")+" | "+(code||"")+" | Section "+(D.info.sec||"—")+" | "+(D.info.sem||"")+" "+(D.info.year||"");
+
+  // Build exam columns — only exams that have weights defined
+  var examCols=[];
+  D.assessments.forEach(function(aconf){
+    aconf.exams.forEach(function(ex,ei){
+      var mx=ex.mx||{};
+      var qcount=ex.qcount||0;
+      var examMax=0;
+      for(var qn=1;qn<=qcount;qn++){
+        var qm=0;
+        D.clos.forEach(function(c){qm+=parseFloat((mx[c.code]||{})[String(qn)])||0;});
+        examMax+=qm;
+      }
+      if(examMax>0) examCols.push({label:ex.name,aconf:aconf,exObj:ex,max:examMax});
+    });
+  });
+
+  if(!examCols.length){
+    ge("screp-tbl").innerHTML='<tr><td style="padding:1rem;color:var(--mu);text-align:center">No data — please set up weight matrices and enter scores first</td></tr>';
+    return;
+  }
+
+  var totalMax=examCols.reduce(function(a,e){return a+e.max;},0);
+
+  // Header — exam score in column header
+  var hdr='<thead><tr><th>#</th><th class="nc">Name</th>';
+  examCols.forEach(function(e){
+    hdr+='<th class="ch">'+e.label+'<br><small style="font-weight:400">/'+e.max+'</small></th>';
+  });
+  hdr+='<th class="ch">Total<br><small style="font-weight:400">/'+totalMax+'</small></th>'+
+       '<th class="ch">%</th><th class="ch">Grade</th></tr></thead>';
+
+  // Body — score only without /max
+  var bdy='<tbody>'+D.students.map(function(s,si){
+    var stuTot=0;
+    var cells=examCols.map(function(e){
+      var ex=e.exObj;
+      var mx=ex.mx||{};
+      var stuSc=(ex.scores&&ex.scores[String(si)])||{};
+      var qcount=ex.qcount||0;
+      var earned=0;
+      for(var qn=1;qn<=qcount;qn++){
+        var qm=0;
+        D.clos.forEach(function(c){qm+=parseFloat((mx[c.code]||{})[String(qn)])||0;});
+        earned+=Math.min(parseFloat(stuSc[String(qn)])||0,qm);
+      }
+      stuTot+=earned;
+      var pct=e.max>0?Math.round(earned/e.max*100):0;
+      return'<td class="ctr" style="font-weight:700;color:'+bc(pct,60)+'">'+earned+'</td>';
+    }).join('');
+    var totalPct=totalMax>0?Math.round(stuTot/totalMax*100):0;
+    return'<tr>'+
+      '<td style="color:var(--mu)">'+(si+1)+'</td>'+
+      '<td class="nc">'+s.name+'</td>'+
+      cells+
+      '<td class="ctr" style="font-weight:800;font-size:13px;color:'+bc(totalPct,60)+'">'+stuTot+'</td>'+
+      '<td class="ctr" style="font-weight:800;color:'+bc(totalPct,60)+'">'+totalPct+'%</td>'+
+      '<td class="ctr" style="font-weight:700;color:'+bc(totalPct,60)+'">'+gfn(totalPct)+'</td></tr>';
+  }).join('')+'</tbody>';
+
+  ge("screp-tbl").innerHTML=hdr+bdy;
+
+  // CSV export
+  ge("btn-exp-screp").onclick=function(){
+    var rows=["﻿Name,"+examCols.map(function(e){return e.label+"/"+e.max;}).join(",")+",Total/"+totalMax+",%,Grade"];
+    D.students.forEach(function(s,si){
+      var stuTot=0;
+      var cells=examCols.map(function(e){
+        var ex=e.exObj;var mx=ex.mx||{};var stuSc=(ex.scores&&ex.scores[String(si)])||{};
+        var qcount=ex.qcount||0;var earned=0;
+        for(var qn=1;qn<=qcount;qn++){
+          var qm=0;D.clos.forEach(function(c){qm+=parseFloat((mx[c.code]||{})[String(qn)])||0;});
+          earned+=Math.min(parseFloat(stuSc[String(qn)])||0,qm);
+        }
+        stuTot+=earned;return earned;
+      });
+      var pct=totalMax>0?Math.round(stuTot/totalMax*100):0;
+      rows.push('"'+s.name+'",'+cells.join(",")+","+stuTot+","+pct+"%,"+gfn(pct));
+    });
+    dl(rows.join("\n"),"scores_report.csv","text/csv;charset=utf-8");
+  };
+}
+
+
+function renderCLOR(){
+  var code=[D.info.c1,D.info.c2,D.info.c3].filter(Boolean).join("-");
+  ge("clor-sub").textContent=(D.info.name||"—")+" | "+(code||"")+" | "+(D.info.sem||"")+" "+(D.info.year||"");
+  ["K","S","V"].forEach(function(t){
+    var el=ge("cr-"+t);
+    var list=D.clos.filter(function(c){return c.type===t;});
+    if(!list.length){el.innerHTML='<p style="color:var(--mu);font-size:12px">None</p>';return;}
+    el.innerHTML=list.map(function(c){
+      var p=cloAchPct(c);var pv=p!==null?p:0;
+      return'<div class="row"><div style="flex:1"><div style="font-size:12.5px;font-weight:700">'+c.code+'</div><div style="font-size:11px;color:var(--mu)">'+c.desc.substring(0,36)+'</div></div>'+
+        '<div class="bw"><div class="bf" style="width:'+pv+'%;background:'+bc(pv,c.pass)+'"></div></div>'+
+        '<span class="bpct" style="color:'+bc(pv,c.pass)+'">'+(p!==null?p+"%":"—")+'</span>'+bdg(p,c.pass)+'</div>';
+    }).join('');
+  });
+  var sh='<thead><tr><th>Outcome</th><th>Type</th><th>Description</th><th class="ch">Total Weights</th><th class="ch">Achievement %</th><th class="ch">Target</th><th class="ch">Status</th></tr></thead><tbody>';
+  D.clos.forEach(function(c){
+    var totalW=0;
+    D.assessments.forEach(function(a){a.exams.forEach(function(ex){var mx=ex.mx||{};var cloMx=mx[c.code]||{};Object.values(cloMx).forEach(function(v){totalW+=parseFloat(v)||0;});});});
+    var p=cloAchPct(c);
+    sh+='</tr><td><span class="rcode">'+c.code+'</span></td><td>'+ttag(c.type)+'</td><td class="nc" style="font-size:12px">'+c.desc+'</td>'+
+      '<td class="ctr" style="font-weight:700">'+totalW+'</td>'+
+      '<td class="ctr" style="font-weight:800;color:'+(p!==null?bc(p,c.pass):'var(--mu)')+'">'+( p!==null?p+"%":"—")+'</td>'+
+      '<td class="ctr">'+c.pass+'%</td><td>'+bdg(p,c.pass)+'</td></tr>';
+  });
+  ge("clo-sum-tbl").innerHTML=sh+'</tbody>';
+  var dh='<thead><tr><th>#</th><th class="nc">Name</th>';
+  D.clos.forEach(function(c){dh+='<th class="ch">'+c.code+'</th>';});
+  dh+='<th class="ch">Total</th></tr></thead><tbody>';
+  dh+=D.students.map(function(s,si){
+    var cells=D.clos.map(function(c){
+      var p=stuCLOpct(si,c.code);
+      return'<td class="ctr"><div style="font-weight:700;font-size:12px;color:'+(p!==null?bc(p,c.pass):'var(--mu)')+'">'+( p!==null?p+"%":"—")+'</div></td>';
+    }).join('');
+    var tot=stuTotal(si);
+    return'<tr><td style="color:var(--mu)">'+(si+1)+'</td><td class="nc">'+s.name+'</td>'+cells+
+      '<td class="ctr" style="font-weight:800;font-size:13px;color:'+(tot!==null?bc(tot,60):'var(--mu)')+'">'+( tot!==null?tot+"%":"—")+'</td></tr>';
+  }).join('');
+  ge("clor-tbl").innerHTML=dh+'</tbody>';
+}
+
+function renderPLOR(){
+  var code=[D.info.c1,D.info.c2,D.info.c3].filter(Boolean).join("-");
+  ge("plor-sub").textContent=(D.info.name||"—")+" | "+(code||"")+" | "+(D.info.sem||"")+" "+(D.info.year||"");
+  var ploMap={};
+  D.plos.forEach(function(p){ploMap[p.code]=[];});
+  D.clos.forEach(function(c){if(c.plo&&ploMap[c.plo])ploMap[c.plo].push(c);});
+  var sorted=sortedPLOs();
+  ge("plo-ach").innerHTML=sorted.map(function(pl){
+    var linked=ploMap[pl.code]||[];
+    var pcts=linked.map(cloAchPct).filter(function(p){return p!==null;});
+    var avg=pcts.length?Math.round(pcts.reduce(function(a,b){return a+b;},0)/pcts.length):null;
+    var pv=avg!==null?avg:0;
+    return'<div class="row"><span class="rcode">'+pl.code+'</span>'+ttag(pl.type)+
+      '<span class="rdesc" style="font-weight:500">'+pl.desc+'</span>'+
+      '<div class="bw"><div class="bf" style="width:'+pv+'%;background:'+(avg!==null?bc(pv,70):'var(--bd)')+'"></div></div>'+
+      '<span class="bpct" style="color:'+(avg!==null?bc(pv,70):'var(--mu)')+'">'+( avg!==null?avg+"%":"—")+'</span>'+bdg(avg,70)+'</div>';
+  }).join('');
+  var mh='<thead><tr><th>CLO</th><th class="nc">Description</th>';
+  sorted.forEach(function(pl){mh+='<th class="ch">'+pl.code+'</th>';});
+  mh+='</thead><tbody>';
+  D.clos.forEach(function(c){
+    var cells=sorted.map(function(pl){
+      var match=c.plo===pl.code;
+      return'<td style="text-align:center;background:'+(match?'var(--okb)':'')+'">'+( match?'✅':'')+'</td>';
+    }).join('');
+    mh+='<tr><td><span class="rcode">'+c.code+'</span></td><td class="nc" style="font-size:11.5px">'+c.desc+'</td>'+cells+'</tr>';
+  });
+  ge("plo-mx-tbl").innerHTML=mh+'</tbody>';
+}
+
+function renderFINR(){
+  var code=[D.info.c1,D.info.c2,D.info.c3].filter(Boolean).join("-");
+  ge("finr-sub").textContent=(D.info.name||"—")+" | "+(code||"")+" | Section "+(D.info.sec||"")+" | "+(D.info.sem||"")+" "+(D.info.year||"");
+  var tots=D.students.map(function(_,i){return stuTotal(i);});
+  var valid=tots.filter(function(v){return v!==null;});
+  ge("fr-t").textContent=D.students.length;
+  ge("fr-p").textContent=valid.filter(function(v){return v>=60;}).length;
+  ge("fr-f").textContent=valid.filter(function(v){return v<60;}).length;
+  ge("fr-a").textContent=valid.length?Math.round(valid.reduce(function(a,b){return a+b;},0)/valid.length)+"%":"—";
+  var hdr='<thead><tr><th>#</th><th>Student ID</th><th class="nc">Name</th>';
+  D.clos.forEach(function(c){hdr+='<th class="ch">'+c.code+'</th>';});
+  hdr+='<th class="ch">Total %</th><th class="ch">Grade</th><th class="ch">Status</th></tr></thead>';
+  var bdy='<tbody>'+D.students.map(function(s,si){
+    var cells=D.clos.map(function(c){var p=stuCLOpct(si,c.code);return'<td class="ctr" style="font-size:12px;font-weight:600;color:'+(p!==null?bc(p,c.pass):'var(--mu)')+'">'+( p!==null?p+"%":"—")+'</td>';}).join('');
+    var tot=tots[si];var gr=tot!==null?gfn(tot):'—';var pass=tot!==null&&tot>=60;
+    return'<tr><td style="color:var(--mu)">'+(si+1)+'</td><td style="font-size:11px;direction:ltr;text-align:right">'+s.id+'</td><td class="nc">'+s.name+'</td>'+cells+
+      '<td class="ctr" style="font-weight:800;font-size:13px;color:'+(tot!==null?bc(tot,60):'var(--mu)')+'">'+( tot!==null?tot+"%":"—")+'</td>'+
+      '<td class="ctr" style="font-weight:700;color:'+(tot!==null?bc(tot,60):'var(--mu)')+'">'+gr+'</td>'+
+      '<td class="ctr"><span class="bb '+(pass?'b-ok':'b-er')+'">'+( tot!==null?(pass?'Passed ✅':'Failed ❌'):'—')+'</span></td>'+
+      '</tr>';
+  }).join('')+'</tbody>';
+  ge("finr-tbl").innerHTML=hdr+bdy;
+}
+
+function renderGRD(){
+  var gn=["A+","A","B+","B","C+","C","D+","D","F"];
+  var cnt={};gn.forEach(function(g){cnt[g]=0;});var total=0;
+  D.students.forEach(function(_,i){var t=stuTotal(i);if(t!==null){cnt[gfn(t)]++;total++;}});
+ge("grd-cells").innerHTML = gn.map(function(g) {
+  return '<div style="flex:0 0 42px;background:var(--bg);border-radius:4px;padding:3px 1px;text-align:center;border-top:2px solid ' + (GCL[g]) + '">' +
+    '<div style="font-size:8px;color:var(--mu);margin-bottom:1px">' + g + '</div>' +
+    '<div style="font-size:16px;font-weight:800;color:' + GCL[g] + '">' + cnt[g] + '</div>' +
+    '<div style="font-size:7px;color:var(--mu)">' + (total ? Math.round(cnt[g] / total * 100) + "%" : "0%") + '</div></div>';
+}).join('');
+  var cv=ge("grd-cv");var ctx=cv.getContext("2d");
+  var w=cv.width=cv.parentElement.offsetWidth||600,h=cv.height=100;
+  ctx.clearRect(0,0,w,h);
+  var mx=Math.max.apply(null,gn.map(function(g){return cnt[g];}).concat([1]));
+  var bw=Math.floor(w/gn.length)-42;
+  gn.forEach(function(g,i){
+    var bh=Math.round((cnt[g]/mx)*(h-26));var x=i*(bw+5)+2,y=h-26-bh;
+    ctx.fillStyle=GCL[g];ctx.fillRect(x,y,bw,bh);
+    ctx.fillStyle="#18273a";ctx.font="bold 14px Cairo";ctx.textAlign="center";ctx.fillText(g,x+bw/2,h-9);
+    if(cnt[g])ctx.fillText(cnt[g],x+bw/2,y>8?y-4:8);
+  });
+  var valid=D.students.map(function(_,i){return stuTotal(i);}).filter(function(v){return v!==null;});
+  var avg=valid.length?Math.round(valid.reduce(function(a,b){return a+b;},0)/valid.length):null;
+  ge("grd-stats").innerHTML=[
+    {l:"Average",v:avg!==null?avg+"%":"—"},
+    {l:"Highest",v:valid.length?Math.max.apply(null,valid)+"%":"—"},
+    {l:"Lowest",v:valid.length?Math.min.apply(null,valid)+"%":"—"},
+    {l:"Pass/Total",v:valid.filter(function(v){return v>=60;}).length+"/"+total}
+  ].map(function(x){return'<div style="background:var(--bg);border-radius:4px;padding:10px;text-align:center"><div style="font-size:18px;font-weight:800;color:var(--pr)">'+x.v+'</div><div style="font-size:16px;color:var(--mu);margin-top:2px">'+x.l+'</div></div>';}).join('');
+}
+
+// ==============================================
+// COURSE REPORT SYSTEM (طباعة بدون مكتبات خارجية)
+// ==============================================
+
+var STORE_KEY_REPORT = STORE_KEY + "_report_manual";
+
+function escapeHtmlSafe(str){
+  if(!str) return "";
+  return str.replace(/[&<>]/g, function(m){
+    if(m==="&") return "&amp;";
+    if(m==="<") return "&lt;";
+    if(m===">") return "&gt;";
+    return m;
+  });
+}
+
+function saveManualData(){
+  var data = {
+    commentGrades: ge("cr-comment-grades") ? ge("cr-comment-grades").value : "",
+    recommendations: ge("cr-recommendations") ? ge("cr-recommendations").value : "",
+    topics: [],
+    plan: []
+  };
+  var topicsBody = ge("cr-topics-body");
+  if(topicsBody){
+    var rows = topicsBody.querySelectorAll("tr");
+    rows.forEach(function(row){
+      var inputs = row.querySelectorAll("input,select");
+      if(inputs.length >= 4){
+        data.topics.push({
+          topic: inputs[0] ? inputs[0].value : "",
+          reason: inputs[1] ? inputs[1].value : "",
+          impact: inputs[2] ? inputs[2].value : "",
+          action: inputs[3] ? inputs[3].value : ""
+        });
+      }
+    });
+  }
+  var planBody = ge("cr-plan-body");
+  if(planBody){
+    var planRows = planBody.querySelectorAll("tr");
+    planRows.forEach(function(row){
+      var inputs = row.querySelectorAll("input");
+      if(inputs.length >= 3){
+        data.plan.push({
+          recommendation: inputs[0] ? inputs[0].value : "",
+          actions: inputs[1] ? inputs[1].value : "",
+          support: inputs[2] ? inputs[2].value : ""
+        });
+      }
+    });
+  }
+  localStorage.setItem(STORE_KEY_REPORT, JSON.stringify(data));
+}
+
+function loadManualData(){
+  try{
+    var saved = localStorage.getItem(STORE_KEY_REPORT);
+    if(saved){
+      var data = JSON.parse(saved);
+      if(ge("cr-comment-grades")) ge("cr-comment-grades").value = data.commentGrades || "";
+      if(ge("cr-recommendations")) ge("cr-recommendations").value = data.recommendations || "";
+      var topicsBody = ge("cr-topics-body");
+      if(data.topics && data.topics.length && topicsBody){
+        topicsBody.innerHTML = "";
+        data.topics.forEach(function(t){
+          addTopicRowFinal(t.topic, t.reason, t.impact, t.action);
+        });
+      }
+      var planBody = ge("cr-plan-body");
+      if(data.plan && data.plan.length && planBody){
+        planBody.innerHTML = "";
+        data.plan.forEach(function(p){
+          addPlanRowFinal(p.recommendation, p.actions, p.support);
+        });
+      }
+    }
+  }catch(e){}
+}
+
+function addTopicRowFinal(topicVal, reasonVal, impactVal, actionVal){
+  var tbody = ge("cr-topics-body");
+  if(!tbody) return;
+  var row = document.createElement("tr");
+  row.innerHTML = `
+    <td style="border:1px solid #ccc;padding:4px"><input type="text" class="fc" style="width:100%" placeholder="Topic" value="${escapeHtmlSafe(topicVal)}"></td>
+    <td style="border:1px solid #ccc;padding:4px"><input type="text" class="fc" style="width:100%" placeholder="Reson for not covering/discrepances" value="${escapeHtmlSafe(reasonVal)}"></td>
+    <td style="border:1px solid #ccc;padding:4px"><select class="fc" style="width:100%"><option value="">—</option><option value="High" ${impactVal==="High"?"selected":""}>High</option><option value="Medium" ${impactVal==="Medium"?"selected":""}>Medium</option><option value="Low" ${impactVal==="Low"?"selected":""}>Low</option></select></td>
+    <td style="border:1px solid #ccc;padding:4px"><input type="text" class="fc" style="width:100%" placeholder="الإجراء التعويضي" value="${escapeHtmlSafe(actionVal)}"></td>
+    <td style="border:1px solid #ccc;padding:4px;text-align:center"><button type="button" class="remove-topic-final" style="background:#c0392b;color:#fff;border:none;border-radius:20px;width:24px;height:24px;cursor:pointer">✕</button></td>
+  `;
+  tbody.appendChild(row);
+  attachRemoveFinal();
+}
+
+function addPlanRowFinal(recVal, actVal, supVal){
+  var pbody = ge("cr-plan-body");
+  if(!pbody) return;
+  var row = document.createElement("tr");
+  row.innerHTML = `
+    <td style="border:1px solid #ccc;padding:4px"><input type="text" class="fc" style="width:100%" placeholder="التوصية" value="${escapeHtmlSafe(recVal)}"></td>
+    <td style="border:1px solid #ccc;padding:4px"><input type="text" class="fc" style="width:100%" placeholder="الإجراءات" value="${escapeHtmlSafe(actVal)}"></td>
+    <td style="border:1px solid #ccc;padding:4px"><input type="text" class="fc" style="width:100%" placeholder="الدعم المطلوب" value="${escapeHtmlSafe(supVal)}"></td>
+    <td style="border:1px solid #ccc;padding:4px;text-align:center"><button type="button" class="remove-plan-final" style="background:#c0392b;color:#fff;border:none;border-radius:20px;width:24px;height:24px;cursor:pointer">✕</button></td>
+  `;
+  pbody.appendChild(row);
+  attachRemoveFinal();
+}
+
+function attachRemoveFinal(){
+  document.querySelectorAll(".remove-topic-final").forEach(function(btn){
+    btn.onclick = function(e){
+      var row = btn.closest("tr");
+      if(row && row.parentElement && row.parentElement.children.length > 1){
+        row.remove();
+        saveManualData();
+      } else {
+        toast("لا يمكن حذف الصف الأخير");
+      }
+    };
+  });
+  document.querySelectorAll(".remove-plan-final").forEach(function(btn){
+    btn.onclick = function(e){
+      var row = btn.closest("tr");
+      if(row && row.parentElement && row.parentElement.children.length > 1){
+        row.remove();
+        saveManualData();
+      } else {
+        toast("لا يمكن حذف الصف الأخير");
+      }
+    };
+  });
+}
+
+function openReportModal(){
+  loadManualData();
+  attachRemoveFinal();
+  openMo("mo-course-report");
+}
+
+function closeReportModal(){
+  closeMo("mo-course-report");
+}
+
+function printFinalReport(){
+  saveManualData();
+  
+  var info = D.info;
+  var code = [info.c1, info.c2, info.c3].filter(Boolean).join("-");
+  
+  // حساب توزيع الدرجات
+  var tots = D.students.map(function(_, i){ return stuTotal(i); });
+  var valid = tots.filter(function(v){ return v !== null; });
+  var gn = ["A+", "A", "B+", "B", "C+", "C", "D+", "D", "F"];
+  var cnt = {};
+  gn.forEach(function(g){ cnt[g] = 0; });
+  valid.forEach(function(t){ cnt[gfn(t)]++; });
+  var passing = valid.filter(function(v){ return v >= 60; }).length;
+  // الحصول على قيم إحصاءات الطلاب من صفحة المعلومات
+  var started = parseInt(info.started) || D.students.length || 0;
+  var denied = parseInt(info.denied) || 0;
+  var withdrawn = parseInt(info.withdrawn) || 0;
+  var incomplete = parseInt(info.incomplete) || 0;
+  var absent = parseInt(info.absent) || 0;
+  var completed = started - denied - withdrawn - incomplete - absent;
+
+
+  // الذين حضروا الاختبار النهائي
+  var passed = passing;  // الناجحين (≥60%)
+  var failed = completed - passed;  // الراسبين (من الذين حضروا الاختبار)
+  
+  if(completed < 0) completed = 0;
+  if(failed < 0) failed = 0;
+  // البيانات اليدوية
+  var commentGrades = ge("cr-comment-grades") ? ge("cr-comment-grades").value || "" : "";
+  var recommendations = ge("cr-recommendations") ? ge("cr-recommendations").value || "" : "";
+  
+  // جمع المواضيع غير المغطاة
+  var topics = [];
+  var topicsBody = ge("cr-topics-body");
+  if(topicsBody){
+    topicsBody.querySelectorAll("tr").forEach(function(row){
+      var inputs = row.querySelectorAll("input,select");
+      if(inputs.length >= 4){
+        var topicVal = inputs[0] ? inputs[0].value : "";
+        var reasonVal = inputs[1] ? inputs[1].value : "";
+        var impactVal = inputs[2] ? inputs[2].value : "";
+        var actionVal = inputs[3] ? inputs[3].value : "";
+        if(topicVal.trim() || reasonVal.trim() || impactVal || actionVal.trim()){
+          topics.push({ topic: topicVal, reason: reasonVal, impact: impactVal, action: actionVal });
+        }
+      }
+    });
+  }
+  
+  // جمع خطة التحسين
+  var planItems = [];
+  var planBody = ge("cr-plan-body");
+  if(planBody){
+    planBody.querySelectorAll("tr").forEach(function(row){
+      var inputs = row.querySelectorAll("input");
+      if(inputs.length >= 3){
+        var recVal = inputs[0] ? inputs[0].value : "";
+        var actVal = inputs[1] ? inputs[1].value : "";
+        var supVal = inputs[2] ? inputs[2].value : "";
+        if(recVal.trim() || actVal.trim() || supVal.trim()){
+          planItems.push({ recommendation: recVal, actions: actVal, support: supVal });
+        }
+      }
+    });
+  }
+  
+  // بناء جدول CLO
+  var cloRows = "";
+  var typeLabels = {K: "Knowledge and Understanding", S: "Skills", V: "Values, Autonomy & Responsibility"};
+  var typeNums = {K: "1", S: "2", V: "3"};
+  ["K","S","V"].forEach(function(t){
+    var list = D.clos.filter(function(c){ return c.type === t; });
+    if(list.length){
+      cloRows += '<tr style="background:#e8f0f8"><td colspan="7" style="padding:8px;font-weight:bold">' + typeNums[t] + '. ' + typeLabels[t] + '</td></tr>';
+      list.forEach(function(c){
+        var p = cloAchPct(c);
+        var methods = [];
+        D.assessments.forEach(function(a){
+          a.exams.forEach(function(ex){
+            var mx = ex.mx || {};
+            var cloMx = mx[c.code] || {};
+            if(Object.values(cloMx).some(function(v){ return parseFloat(v) > 0; })){
+              methods.push(ex.name);
+            }
+          });
+        });
+        cloRows += '<tr>' +
+          '<td style="border:1px solid #ccc;padding:8px;font-weight:bold">' + c.code + '</td>' +
+          '<td style="border:1px solid #ccc;padding:8px">' + c.desc + '</td>' +
+          '<td style="border:1px solid #ccc;padding:8px;text-align:center">' + (c.plo || "—") + '</td>' +
+'<td style="border:1px solid #ccc;padding:8px;font-size:9pt">' + (c.assessmentMethods || "—") + '</td>' +
+          '<td style="border:1px solid #ccc;padding:8px;text-align:center">' + c.pass + '%</td>' +
+          '<td style="border:1px solid #ccc;padding:8px;text-align:center;font-weight:bold;color:' + (p !== null ? (p >= c.pass ? "#1a7a4a" : "#c0392b") : "#888") + '">' + (p !== null ? p + "%" : "—") + '</td>' +
+          '<td style="border:1px solid #ccc;padding:8px"> </td>' +
+          '</tr>';
+      });
+    }
+  });
+  
+  // بناء جدول PLO
+  var ploMap = {};
+  D.plos.forEach(function(p){ ploMap[p.code] = []; });
+  D.clos.forEach(function(c){ if(c.plo && ploMap[c.plo]) ploMap[c.plo].push(c); });
+  var ploRows = "";
+  D.plos.forEach(function(pl){
+    var linked = ploMap[pl.code] || [];
+    var pcts = linked.map(cloAchPct).filter(function(p){ return p !== null; });
+    var avg = pcts.length ? Math.round(pcts.reduce(function(a,b){ return a+b; },0) / pcts.length) : null;
+    ploRows += '<tr>' +
+      '<td style="border:1px solid #ccc;padding:8px;font-weight:bold">' + pl.code + '</td>' +
+      '<td style="border:1px solid #ccc;padding:8px;font-size:9pt">' + pl.desc + '</td>' +
+      '<td style="border:1px solid #ccc;padding:8px;text-align:center;font-weight:bold">' + (avg !== null ? avg + "%" : "—") + '</td>' +
+      '<td style="border:1px solid #ccc;padding:8px;text-align:center">' + (avg === null ? "—" : (avg >= 70 ? "✓ Achieved" : "✗ Not Achieved")) + '</td>' +
+      '</tr>';
+  });
+  
+  // صفوف توزيع الدرجات
+  var gradeNumberRow = "";
+  var gradePercentRow = "";
+  gn.forEach(function(g){ 
+    gradeNumberRow += '<td style="text-align:center;padding:8px;border:1px solid #ccc">' + cnt[g] + '</td>';
+    gradePercentRow += '<td style="text-align:center;padding:8px;border:1px solid #ccc">' + (valid.length ? Math.round(cnt[g] / valid.length * 100) + "%" : "0%") + '</td>';
+  });
+  
+  // صفوف المواضيع غير المغطاة
+  var topicsRows = "";
+  if(topics.length){
+    topics.forEach(function(t){
+      topicsRows += '<tr>' +
+        '<td style="border:1px solid #ccc;padding:8px">' + escapeHtmlSafe(t.topic || "") + '</td>' +
+        '<td style="border:1px solid #ccc;padding:8px">' + escapeHtmlSafe(t.reason || "") + '</td>' +
+        '<td style="border:1px solid #ccc;padding:8px">' + escapeHtmlSafe(t.impact || "") + '</td>' +
+        '<td style="border:1px solid #ccc;padding:8px">' + escapeHtmlSafe(t.action || "") + '</td>' +
+        '</tr>';
+    });
+  } else {
+    topicsRows = '<tr><td colspan="4" style="padding:15px;text-align:center;color:#888">None</td></tr>';
+  }
+  
+  // صفوف خطة التحسين
+  var planRows = "";
+  if(planItems.length){
+    planItems.forEach(function(p){
+      planRows += '<tr>' +
+        '<td style="border:1px solid #ccc;padding:8px">' + escapeHtmlSafe(p.recommendation || "") + '</td>' +
+        '<td style="border:1px solid #ccc;padding:8px">' + escapeHtmlSafe(p.actions || "") + '</td>' +
+        '<td style="border:1px solid #ccc;padding:8px">' + escapeHtmlSafe(p.support || "") + '</td>' +
+        '</tr>';
+    });
+  } else {
+    planRows = '<tr><td colspan="3" style="padding:15px;text-align:center;color:#888">None</td></tr>';
+  }
+  
+  // بناء HTML النهائي مطابق لـ TP-154
+  var printHtml = '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
+    '<title>Course Report - ' + escapeHtmlSafe(info.name || "") + '</title>' +
+    '<style>' +
+    'body { font-family: Arial, sans-serif; font-size: 11pt; margin: 2cm; line-height: 1.4; }' +
+    '.header { text-align: center; margin-bottom: 20px; }' +
+    '.header-title { font-size: 16pt; font-weight: bold; color: #11426E; }' +
+    '.header-subtitle { font-size: 12pt; color: #555; }' +
+    'table { border-collapse: collapse; width: 100%; margin: 10px 0; }' +
+    'th, td { border: 1px solid #999; padding: 8px; vertical-align: top; }' +
+    'th { background: #11426E; color: white; font-weight: bold; text-align: center; }' +
+    '.section-title { font-size: 14pt; font-weight: bold; margin: 20px 0 10px; border-bottom: 2px solid #C9A84C; padding-bottom: 5px; }' +
+    '.sub-title { font-size: 12pt; font-weight: bold; margin: 15px 0 8px; }' +
+    '.grade-table th, .grade-table td { border: 1px solid #ccc; padding: 8px; text-align: center; }' +
+    '.grade-table th { background: #11426E; color: white; }' +
+    '.comment-box { background: #f9f9f9; padding: 12px; border-left: 4px solid #C9A84C; margin: 10px 0; }' +
+    '.signatures { display: flex; justify-content: space-between; margin-top: 30px; }' +
+    '.signature { text-align: center; flex: 1; }' +
+    '.signature-line { border-top: 1px solid #000; width: 70%; margin: 0 auto; padding-top: 5px; }' +
+    '.footer-text { text-align: center; margin-top: 20px; font-size: 9pt; color: #666; }' +
+    '@media print { body { margin: 1.5cm; } .no-print { display: none; } }' +
+    '</style>' +
+    '<body>' +
+    
+    // ==================== PAGE 1 - HEADER ====================
+    '<div style="text-align:center; margin-bottom:20px;">' +
+    '<img src="logo2.png" style="max-width:100%;">' +
+    '</div>' +
+    
+    // جدول معلومات المقرر (مطابق للنموذج)
+    // جدول معلومات المقرر (مع لون أزرق للعنوان وأسود للقيمة)
+    '<table style="width:100%; border-collapse:collapse; margin-top:20px; border:1px solid #000;">' +
+    '<tr style="border:1px solid #000;">' +
+    '<td style="border:1px solid #000; padding:8px; width:50%;"><b style="color:#11426E;">Course Title:</b> <span style="color:#000;">' + escapeHtmlSafe(info.name || "") + '</span></td>' +
+    '<td style="border:1px solid #000; padding:8px;"><b style="color:#11426E;">Course Code:</b> <span style="color:#000;">' + escapeHtmlSafe(code || "") + '</span></td>' +
+    '</tr>' +
+    '<tr style="border:1px solid #000;">' +
+    '<td style="border:1px solid #000; padding:8px;"><b style="color:#11426E;">Department:</b> <span style="color:#000;">Mathematical Science</span></td>' +
+    '<td style="border:1px solid #000; padding:8px;"><b style="color:#11426E;">Program:</b> <span style="color:#000;">B.Sc. Mathematics</span></td>' +
+    '</tr>' +
+    '<tr style="border:1px solid #000;">' +
+    '<td style="border:1px solid #000; padding:8px;"><b style="color:#11426E;">College:</b> <span style="color:#000;">College of Science & Arts</span></td>' +
+    '<td style="border:1px solid #000; padding:8px;"><b style="color:#11426E;">Institution:</b> <span style="color:#000;">Najran University</span></td>' +
+    '</tr>' +
+    '<tr style="border:1px solid #000;">' +
+    '<td style="border:1px solid #000; padding:8px;"><b style="color:#11426E;">Academic Year:</b> <span style="color:#000;">' + escapeHtmlSafe(info.year || "") + '</span></td>' +
+    '<td style="border:1px solid #000; padding:8px;"><b style="color:#11426E;">Semester:</b> <span style="color:#000;">' + escapeHtmlSafe(info.sem || "") + '</span></td>' +
+    '</tr>' +
+    '<tr style="border:1px solid #000;">' +
+    '<td style="border:1px solid #000; padding:8px;"><b style="color:#11426E;">Course Instructor:</b> <span style="color:#000;">' + escapeHtmlSafe(info.inst || "") + '</span></td>' +
+    '<td style="border:1px solid #000; padding:8px;"><b style="color:#11426E;">Course Coordinator:</b> <span style="color:#000;">' + escapeHtmlSafe(info.inst || "") + '</span></td>' +
+    '</tr>' +
+    '<tr style="border:1px solid #000;">' +
+    '<td style="border:1px solid #000; padding:8px;"><b style="color:#11426E;">Location:</b> <span style="color:#000;">Main campus ☑ &nbsp;&nbsp; branch ☐</span></td>' +
+    '<td style="border:1px solid #000; padding:8px;"><b style="color:#11426E;">Section(s):</b> <span style="color:#000;">' + escapeHtmlSafe(info.sec || "") + '</span></td>' +
+    '</tr>' +
+    '<tr style="border:1px solid #000;">' +
+    '<td style="border:1px solid #ccc; padding:8px"><b>Number of Students (Starting):</b> ' + started + '</td>' +
+    '<td style="border:1px solid #ccc; padding:8px"><b>Number of Students (Completed):</b> ' + completed + '</td>' +
+    '</tr>' +
+    '<tr style="border:1px solid #000;">' +
+    '<td style="border:1px solid #000; padding:8px;" colspan="2"><b style="color:#11426E;">Report Date:</b> <span style="color:#000;">' + new Date().toLocaleDateString("en-US") + '</span></td>' +
+    '</tr>' +
+    '</table>' +
+
+
+
+    // ==================== PAGE 2 - RESULTS ====================
+    // ==================== GRADE DISTRIBUTION ====================
+    '<div class="section-title">A. Student Results</div>' +
+    '<div class="sub-title">1. Grade Distribution</div>' +
+    '<table style="width:100%; border-collapse:collapse; margin-bottom:20px">' +
+    // الصف الأول - العناوين الرئيسية (خلفية زرقاء - نص أبيض)
+    '<tr style="background-color: #11426E; color: white;">' +
+    '<th rowspan="2" style="border:1px solid #999; padding:8px; text-align:center; vertical-align:middle;">&nbsp;</th>' +
+    '<th colspan="9" style="border:1px solid #999; padding:8px; text-align:center;">Grades</th>' +
+    '<th colspan="7" style="border:1px solid #999; padding:8px; text-align:center;">Status Distributions</th>' +
+    '</tr>' +
+    // الصف الثاني - التفاصيل (خلفية زرقاء - نص أبيض)
+    '<tr style="background-color: #11426E; color: white;">' +
+    '<th style="border:1px solid #999; padding:8px;">A+</th><th>A</th><th>B+</th><th>B</th><th>C+</th><th>C</th><th>D+</th><th>D</th><th>F</th>' +
+    '<th>Denied Entry</th><th>In Progress</th><th>Incomplete</th><th>Pass</th><th>Fail</th><th>Withdrawn</th>' +
+    '</tr>' +
+    // صف الأعداد
+    '<tr style="background-color: #fff;">' +
+    // صف الأعداد
+    '<tr style="background-color: #fff;">' +
+    '<td style="border:1px solid #999; padding:8px; font-weight:bold; background-color:#f5f5f5;"><span style="color:#000;">Number of Students</span></td>' +
+    // Grades (9 أعمدة)
+    '<td style="border:1px solid #999; padding:8px; text-align:center;"><span style="color:#000;">' + cnt["A+"] + '</span></td>' +
+    '<td style="text-align:center;"><span style="color:#000;">' + cnt["A"] + '</span></td>' +
+    '<td style="text-align:center;"><span style="color:#000;">' + cnt["B+"] + '</span></td>' +
+    '<td style="text-align:center;"><span style="color:#000;">' + cnt["B"] + '</span></td>' +
+    '<td style="text-align:center;"><span style="color:#000;">' + cnt["C+"] + '</span></td>' +
+    '<td style="text-align:center;"><span style="color:#000;">' + cnt["C"] + '</span></td>' +
+    '<td style="text-align:center;"><span style="color:#000;">' + cnt["D+"] + '</span></td>' +
+    '<td style="text-align:center;"><span style="color:#000;">' + cnt["D"] + '</span></td>' +
+    '<td style="text-align:center;"><span style="color:#000;">' + cnt["F"] + '</span></td>' +
+    // Status Distributions (6 أعمدة)
+    '<td style="text-align:center;"><span style="color:#000;">' + denied + '</span></td>' +                 // Denied Entry
+    '<td style="text-align:center;"><span style="color:#000;">' + completed + '</span></td>' +   // In Progress
+    '<td style="text-align:center;"><span style="color:#000;">' + incomplete + '</span></td>' +            // Incomplete
+    '<td style="text-align:center; background-color:#d4f2e4; font-weight:bold;"><span style="color:#000;">' + passed + '</span></td>' +   // Pass
+    '<td style="text-align:center; background-color:#fde0e0; font-weight:bold;"><span style="color:#000;">' + failed + '</span></td>' +   // Fail
+    '<td style="text-align:center;"><span style="color:#000;">' + withdrawn + '</span></td>' +            // Withdrawn
+    '</tr>' +
+    // صف النسب المئوية
+    // صف النسب المئوية
+    '<tr style="background-color: #fff;">' +
+    '<td style="border:1px solid #999; padding:8px; font-weight:bold; background-color:#f5f5f5;"><span style="color:#000;">Percentage</span></td>' +
+    // Grades (9 أعمدة)
+    '<td style="text-align:center;"><span style="color:#000;">' + (valid.length ? Math.round(cnt["A+"] / valid.length * 100) + "%" : "0%") + '</span></td>' +
+    '<td style="text-align:center;"><span style="color:#000;">' + (valid.length ? Math.round(cnt["A"] / valid.length * 100) + "%" : "0%") + '</span></td>' +
+    '<td style="text-align:center;"><span style="color:#000;">' + (valid.length ? Math.round(cnt["B+"] / valid.length * 100) + "%" : "0%") + '</span></td>' +
+    '<td style="text-align:center;"><span style="color:#000;">' + (valid.length ? Math.round(cnt["B"] / valid.length * 100) + "%" : "0%") + '</span></td>' +
+    '<td style="text-align:center;"><span style="color:#000;">' + (valid.length ? Math.round(cnt["C+"] / valid.length * 100) + "%" : "0%") + '</span></td>' +
+    '<td style="text-align:center;"><span style="color:#000;">' + (valid.length ? Math.round(cnt["C"] / valid.length * 100) + "%" : "0%") + '</span></td>' +
+    '<td style="text-align:center;"><span style="color:#000;">' + (valid.length ? Math.round(cnt["D+"] / valid.length * 100) + "%" : "0%") + '</span></td>' +
+    '<td style="text-align:center;"><span style="color:#000;">' + (valid.length ? Math.round(cnt["D"] / valid.length * 100) + "%" : "0%") + '</span></td>' +
+    '<td style="text-align:center;"><span style="color:#000;">' + (valid.length ? Math.round(cnt["F"] / valid.length * 100) + "%" : "0%") + '</span></td>' +
+    // Status Distributions (6 أعمدة)
+    '<td style="text-align:center;"><span style="color:#000;">' + (started ? Math.round(denied / started * 100) + "%" : "0%") + '</span></td>' +        // Denied Entry
+    '<td style="text-align:center;"><span style="color:#000;">' + (started ? Math.round(completed / started * 100) + "%" : "0%") + '</span></td>' +   // In Progress
+    '<td style="text-align:center;"><span style="color:#000;">' + (started ? Math.round(incomplete / started * 100) + "%" : "0%") + '</span></td>' +   // Incomplete
+    '<td style="text-align:center; background-color:#d4f2e4; font-weight:bold;"><span style="color:#000;">' + (started ? Math.round(passed / started * 100) + "%" : "0%") + '</span></td>' +   // Pass
+    '<td style="text-align:center; background-color:#fde0e0; font-weight:bold;"><span style="color:#000;">' + (started ? Math.round(failed / started * 100) + "%" : "0%") + '</span></td>' +   // Fail
+    '<td style="text-align:center;"><span style="color:#000;">' + (started ? Math.round(withdrawn / started * 100) + "%" : "0%") + '</span></td>' +   // Withdrawn
+    '</tr>' +
+    '</table>' +
+    
+    '<div class="sub-title">2. Comment on Student Grades</div>' +
+    '<div class="comment-box">' + (commentGrades.trim() ? escapeHtmlSafe(commentGrades).replace(/\n/g, '<br>') : '<span style="color:#888">[No comments entered]</span>') + '</div>' +
+    
+    // ==================== PAGE 3 - CLO RESULTS ====================
+    '<div class="section-title">B. Course Learning Outcomes</div>' +
+    '<div class="sub-title">1. Course Learning Outcomes Assessment Results</div>' +
+    '<table style="width:100%; border-collapse:collapse">' +
+    '<thead>' +
+    '<tr><th>CLO</th><th>Description</th><th>PLO</th><th>Assessment Methods</th><th>Target (%)</th><th>Actual (%)</th><th>Comment</th></tr>' +
+    '</thead>' +
+    '<tbody>' + cloRows + '</tbody>' +
+    '</table>' +
+    
+    '<div class="sub-title">PLO Achievement Summary</div>' +
+    '<table style="width:100%; border-collapse:collapse">' +
+    '<thead><tr><th>PLO</th><th>Description</th><th>Actual Level</th><th>Status</th></tr></thead>' +
+    '<tbody>' + ploRows + '</tbody>' +
+    '</table>' +
+    
+    '<div class="sub-title">2. Recommendations</div>' +
+    '<div class="comment-box">' + (recommendations.trim() ? escapeHtmlSafe(recommendations).replace(/\n/g, '<br>') : '<span style="color:#888">[No recommendations entered]</span>') + '</div>' +
+    
+    // ==================== PAGE 4 - TOPICS & IMPROVEMENT ====================
+    '<div class="section-title">C. Topics Not Covered</div>' +
+    '<table style="width:100%; border-collapse:collapse">' +
+    '<thead><tr><th>Topic</th><th>Reason for Not Covering</th><th>Impact on Learning Outcomes</th><th>Compensating Action</th></tr></thead>' +
+    '<tbody>' + topicsRows + '</tbody>' +
+    '</table>' +
+    
+    '<div class="section-title">D. Course Improvement Plan</div>' +
+    '<table style="width:100%; border-collapse:collapse">' +
+    '<thead><tr><th>Recommendations</th><th>Actions</th><th>Needed Support</th></tr></thead>' +
+    '<tbody>' + planRows + '</tbody>' +
+    '</table>' +
+    
+    // التوقيعات
+    '<div class="signatures">' +
+    '<div class="signature"><div class="signature-line">Instructor Signature</div><div style="margin-top:5px">' + escapeHtmlSafe(info.inst || "") + '</div></div>' +
+    '<div class="signature"><div class="signature-line">Report Date</div><div style="margin-top:5px">' + new Date().toLocaleDateString("en-US") + '</div></div>' +
+    '</div>' +
+    
+    
+    '<div class="no-print" style="text-align:center;margin-top:20px;padding:10px;background:#eee">' +
+    '<p>🖨️ Press Ctrl+P (or ⌘+P on Mac) then select "Save as PDF"</p>' +
+    '</div>' +
+    '</body></html>';
+  
+  var printWindow = window.open('', '_blank');
+  
+  printWindow.document.write(printHtml);
+
+  var placeholder = printWindow.document.getElementById("logo-placeholder");
+  if(placeholder) {
+      placeholder.appendChild(img);
+  }
+
+  printWindow.document.close();
+  printWindow.focus();
+  // التأخير البسيط يضمن تحميل الصورة قبل الطباعة
+  setTimeout(function() { printWindow.print(); }, 500);
+
+}
+
+
+function initCourseReport(){
+  // للزر الموجود في صفحة التقرير الجديدة
+  var btn = ge("btn-open-report-modal");
+  if(btn){
+    btn.onclick = function(e){
+      e.preventDefault();
+      openReportModal();
+    };
+  }
+  
+  // للتوافق مع الزر القديم إن وجد
+  var oldBtn = ge("btn-gen-word");
+  if(oldBtn){
+    oldBtn.innerHTML = "📄 Course Report (PDF)";
+    oldBtn.onclick = function(e){
+      e.preventDefault();
+      openReportModal();
+    };
+  }
+  
+  if(ge("mo-cr-x")) ge("mo-cr-x").onclick = function(){ closeReportModal(); };
+  if(ge("btn-cr-cancel")) ge("btn-cr-cancel").onclick = function(){ closeReportModal(); };
+  if(ge("btn-cr-print-pdf")) ge("btn-cr-print-pdf").onclick = function(){ printFinalReport(); closeReportModal(); };
+  if(ge("btn-cr-add-topic")) ge("btn-cr-add-topic").onclick = function(){ addTopicRowFinal("", "", "", ""); };
+  if(ge("btn-cr-add-plan")) ge("btn-cr-add-plan").onclick = function(){ addPlanRowFinal("", "", ""); };
+  
+  var inputs = ["cr-comment-grades", "cr-recommendations"];
+  inputs.forEach(function(id){
+    var el = ge(id);
+    if(el) el.addEventListener("input", saveManualData);
+  });
+}
+// ==============================================
+// PRINT FUNCTIONS FOR ALL REPORTS
+// ==============================================
+
+function printScoresReport() {
+  var printContents = document.getElementById("screp-tbl").cloneNode(true);
+  var courseTitle = D.info.name || "Course";
+  var courseCode = [D.info.c1, D.info.c2, D.info.c3].filter(Boolean).join("-");
+  
+  var printHtml = '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
+    '<title>Scores Report - ' + courseTitle + '</title>' +
+    '<style>' +
+    'body { font-family: Arial, sans-serif; font-size: 11pt; margin: 2cm; }' +
+    'h1 { text-align: center; color: #11426E; }' +
+    'table { border-collapse: collapse; width: 100%; margin: 10px 0; }' +
+    'th, td { border: 1px solid #999; padding: 8px; text-align: center; }' +
+    'th { background-color: #11426E; color: white; }' +
+    '</style>' +
+    '</head><body>' +
+    '<h1>Scores Report</h1>' +
+    '<p><strong>Course:</strong> ' + courseTitle + ' (' + courseCode + ')</p>' +
+    '<p><strong>Date:</strong> ' + new Date().toLocaleDateString() + '</p>' +
+    printContents.outerHTML +
+    '</body></html>';
+  
+  var printWindow = window.open('', '_blank');
+  printWindow.document.write(printHtml);
+  printWindow.document.close();
+  printWindow.focus();
+  printWindow.print();
+  printWindow.onafterprint = function() { printWindow.close(); };
+}
+
+function printCLOReport() {
+  var courseTitle = D.info.name || "Course";
+  var courseCode = [D.info.c1, D.info.c2, D.info.c3].filter(Boolean).join("-");
+  
+  // بناء محتوى التقرير من البيانات مباشرة (بدون استنساخ DOM)
+  var cloSummaryHtml = "";
+  
+  // بناء جدول CLO
+  var cloTableHtml = '<table style="width:100%; border-collapse:collapse; margin-top:10px">' +
+    '<thead>' +
+    '<tr style="background-color:#11426E; color:white;">' +
+    '<th style="border:1px solid #999; padding:8px;">CLO</th>' +
+    '<th style="border:1px solid #999; padding:8px;">Description</th>' +
+    '<th style="border:1px solid #999; padding:8px;">Type</th>' +
+    '<th style="border:1px solid #999; padding:8px;">PLO</th>' +
+    '<th style="border:1px solid #999; padding:8px;">Achievement</th>' +
+    '<th style="border:1px solid #999; padding:8px;">Target</th>' +
+    '<th style="border:1px solid #999; padding:8px;">Status</th>' +
+    '</tr>' +
+    '</thead><tbody>';
+  
+  D.clos.forEach(function(c) {
+    var p = cloAchPct(c);
+    var status = (p !== null) ? (p >= c.pass ? "Excellent ✅" : (p >= 60 ? "Acceptable ⚠" : "Below Level ❌")) : "No data";
+    var typeLabel = {K:"Knowledge", S:"Skill", V:"Value"}[c.type] || c.type;
+    cloTableHtml += '<tr>' +
+      '<td style="border:1px solid #999; padding:8px; font-weight:bold;">' + c.code + '</td>' +
+      '<td style="border:1px solid #999; padding:8px;">' + c.desc + '</td>' +
+      '<td style="border:1px solid #999; padding:8px; text-align:center;">' + typeLabel + '</td>' +
+      '<td style="border:1px solid #999; padding:8px; text-align:center;">' + (c.plo || "—") + '</td>' +
+      '<td style="border:1px solid #999; padding:8px; text-align:center; font-weight:bold; color:' + (p !== null ? (p >= c.pass ? "#1a7a4a" : (p >= 60 ? "#C9A84C" : "#c0392b")) : "#888") + ';">' + (p !== null ? p + "%" : "—") + '</td>' +
+      '<td style="border:1px solid #999; padding:8px; text-align:center;">' + c.pass + '%</td>' +
+      '<td style="border:1px solid #999; padding:8px; text-align:center;">' + status + '</td>' +
+      '</tr>';
+  });
+  cloTableHtml += '</tbody></table>';
+  
+  var printHtml = '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
+    '<title>CLO Report - ' + courseTitle + '</title>' +
+    '<style>' +
+    'body { font-family: Arial, sans-serif; font-size: 11pt; margin: 2cm; }' +
+    'h1 { text-align: center; color: #11426E; }' +
+    'table { border-collapse: collapse; width: 100%; margin: 10px 0; }' +
+    'th, td { border: 1px solid #999; padding: 8px; }' +
+    'th { background-color: #11426E; color: white; }' +
+    '</style>' +
+    '</head><body>' +
+    '<h1>CLO Achievement Report</h1>' +
+    '<p><strong>Course:</strong> ' + courseTitle + ' (' + courseCode + ')</p>' +
+    '<p><strong>Date:</strong> ' + new Date().toLocaleDateString() + '</p>' +
+    cloTableHtml +
+    '</body></html>';
+  
+  var printWindow = window.open('', '_blank');
+  printWindow.document.write(printHtml);
+  printWindow.document.close();
+  printWindow.focus();
+  printWindow.print();
+  printWindow.onafterprint = function() { printWindow.close(); };
+}
+
+function printPLOReport() {
+  var printContents = document.getElementById("plo-ach").cloneNode(true);
+  var courseTitle = D.info.name || "Course";
+  
+  var printHtml = '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
+    '<title>PLO Report - ' + courseTitle + '</title>' +
+    '<style>' +
+    'body { font-family: Arial, sans-serif; font-size: 11pt; margin: 2cm; }' +
+    'h1 { text-align: center; color: #11426E; }' +
+    'table { border-collapse: collapse; width: 100%; margin: 10px 0; }' +
+    'th, td { border: 1px solid #999; padding: 8px; }' +
+    'th { background-color: #11426E; color: white; }' +
+    '</style>' +
+    '</head><body>' +
+    '<h1>PLO Achievement Report</h1>' +
+    '<p><strong>Course:</strong> ' + courseTitle + '</p>' +
+    '<p><strong>Date:</strong> ' + new Date().toLocaleDateString() + '</p>' +
+    printContents.outerHTML +
+    '</body></html>';
+  
+  var printWindow = window.open('', '_blank');
+  printWindow.document.write(printHtml);
+  printWindow.document.close();
+  printWindow.focus();
+  printWindow.print();
+  printWindow.onafterprint = function() { printWindow.close(); };
+}
+
+function printFinalResultsReport() {
+  var printContents = document.getElementById("finr-tbl").cloneNode(true);
+  var courseTitle = D.info.name || "Course";
+  
+  var printHtml = '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
+    '<title>Final Results - ' + courseTitle + '</title>' +
+    '<style>' +
+    'body { font-family: Arial, sans-serif; font-size: 11pt; margin: 2cm; }' +
+    'h1 { text-align: center; color: #11426E; }' +
+    'table { border-collapse: collapse; width: 100%; margin: 10px 0; }' +
+    'th, td { border: 1px solid #999; padding: 8px; }' +
+    'th { background-color: #11426E; color: white; }' +
+    '</style>' +
+    '</head><body>' +
+    '<h1>Final Results</h1>' +
+    '<p><strong>Course:</strong> ' + courseTitle + '</p>' +
+    '<p><strong>Date:</strong> ' + new Date().toLocaleDateString() + '</p>' +
+    printContents.outerHTML +
+    '</body></html>';
+  
+  var printWindow = window.open('', '_blank');
+  printWindow.document.write(printHtml);
+  printWindow.document.close();
+  printWindow.focus();
+  printWindow.print();
+  printWindow.onafterprint = function() { printWindow.close(); };
+}
+
+function printGradeDistribution() {
+  var printContents = document.getElementById("grd-cells").cloneNode(true);
+  var courseTitle = D.info.name || "Course";
+  
+  var printHtml = '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
+    '<title>Grade Distribution - ' + courseTitle + '</title>' +
+    '<style>' +
+    'body { font-family: Arial, sans-serif; font-size: 11pt; margin: 2cm; }' +
+    'h1 { text-align: center; color: #11426E; }' +
+    'table { border-collapse: collapse; width: 100%; margin: 10px 0; }' +
+    'th, td { border: 1px solid #999; padding: 8px; }' +
+    'th { background-color: #11426E; color: white; }' +
+    '</style>' +
+    '</head><body>' +
+    '<h1>Grade Distribution</h1>' +
+    '<p><strong>Course:</strong> ' + courseTitle + '</p>' +
+    '<p><strong>Date:</strong> ' + new Date().toLocaleDateString() + '</p>' +
+    printContents.outerHTML +
+    '</body></html>';
+  
+  var printWindow = window.open('', '_blank');
+  printWindow.document.write(printHtml);
+  printWindow.document.close();
+  printWindow.focus();
+  printWindow.print();
+  printWindow.onafterprint = function() { printWindow.close(); };
+}
+
+function printOfficialCard() {
+  var card = document.getElementById("official-report-card");
+  
+  // تعديل الشعار داخل البطاقة مؤقتاً للطباعة
+  var tempCard = card.cloneNode(true);
+  var logoDiv = tempCard.querySelector('div[style*="C9A84C"]');
+  if (logoDiv) {
+    logoDiv.style.color = "#C9A84C";
+    logoDiv.style.webkitPrintColorAdjust = "exact";
+    logoDiv.style.printColorAdjust = "exact";
+  }
+  
+  var cardHtml = tempCard.outerHTML;
+
+  var printHtml = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Official Course Card</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Cairo", Arial, sans-serif;
+      background: #fff;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      direction: ltr;
+    }
+    #official-report-card {
+      max-width: 820px;
+      width: 100%;
+      background: #fff;
+      border: 1px solid #d0d8e8;
+      border-radius: 12px;
+      overflow: hidden;
+      font-family: "Cairo", Arial, sans-serif;
+    }
+    /* رأس البطاقة */
+    #official-report-card > div:first-child {
+      background: #11426E !important;
+      padding: 1.2rem 1.5rem;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    /* الشعار الذهبي */
+    #official-report-card .system-logo,
+    #official-report-card div[style*="C9A84C"] {
+      color: #C9A84C !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    /* الخط الذهبي */
+    #official-report-card .go-line {
+      height: 4px;
+      background: #C9A84C !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    /* معلومات المقرر */
+    #official-report-card .info-section {
+      padding: 1rem 1.5rem;
+      background: #f8f9ff !important;
+      border-bottom: 1px solid #d0d8e8;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    #official-report-card .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 24px;
+      font-size: 13px;
+      direction: ltr;
+    }
+    #official-report-card .info-grid span {
+      color: #5a6a7a;
+      font-weight: 600;
+    }
+    #official-report-card .info-grid strong {
+      color: #11426E;
+    }
+    #official-report-card .content {
+      padding: 1rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+    #official-report-card table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      direction: ltr;
+    }
+    #official-report-card table th {
+      background: #11426E !important;
+      color: #fff !important;
+      padding: 6px 10px;
+      text-align: right;
+      border: 1px solid #ccc;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    #official-report-card table td {
+      padding: 6px 10px;
+      border: 1px solid #ccc;
+    }
+    #official-report-card table td.center {
+      text-align: center;
+    }
+    .b-ok { background: #d4f2e4 !important; color: #1a7a4a !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    .b-wn { background: #fff3cc !important; color: #7a5000 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    .b-er { background: #fde0e0 !important; color: #8a1a1a !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    .b-na { background: #eef2f8 !important; color: #5a6a7a !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    .grade-grid {
+      display: grid;
+      grid-template-columns: repeat(9, 1fr);
+      gap: 5px;
+      margin-top: 8px;
+    }
+    .grade-item {
+      background: #f5f5f5 !important;
+      border-radius: 6px;
+      padding: 6px;
+      text-align: center;
+      border-top: 3px solid #ccc;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    .grade-item .g-label { font-size: 10px; color: #5a6a7a; }
+    .grade-item .g-count { font-size: 16px; font-weight: 800; }
+    .grade-item .g-pct { font-size: 9px; color: #5a6a7a; }
+    .signatures {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      margin-top: 0.5rem;
+      direction: ltr;
+    }
+    .signatures .sig-item {
+      text-align: center;
+      border-top: 1px solid #d0d8e8;
+      padding-top: 8px;
+    }
+    .signatures .sig-item .sig-label {
+      font-size: 11px;
+      color: #5a6a7a;
+      margin-bottom: 3px;
+    }
+    .signatures .sig-item .sig-name {
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .footer {
+      text-align: center;
+      font-size: 10px;
+      color: #5a6a7a;
+      border-top: 1px solid #d0d8e8;
+      padding-top: 8px;
+      direction: ltr;
+    }
+    .no-print { display: none !important; }
+
+    @media print {
+      body { padding: 0.5cm; margin: 0; background: #fff; }
+      #official-report-card { box-shadow: none; border: 1px solid #ccc; }
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  ${cardHtml}
+</body>
+</html>`;
+
+  var printWindow = window.open('', '_blank');
+  printWindow.document.write(printHtml);
+  printWindow.document.close();
+  printWindow.focus();
+  setTimeout(function() {
+    printWindow.print();
+  }, 400);
+}
+// EVENT WIRING
+window.addEventListener("DOMContentLoaded", function(){
+  loadD();
+  updateInfoCard();
+  initCourseReport();
+  
+  PAGES.forEach(function(id){
+    var el = ge("nv-"+id);
+    if(el) el.addEventListener("click",function(){ navTo(id); });
+  });
+
+  // Print buttons
+  var printScoresBtn = ge("btn-print-scores");
+  if(printScoresBtn) printScoresBtn.addEventListener("click", printScoresReport);
+  
+  var printCLOBtn = ge("btn-print-clo");
+  if(printCLOBtn) printCLOBtn.addEventListener("click", printCLOReport);
+  
+  var printPLOBtn = ge("btn-print-plo");
+  if(printPLOBtn) printPLOBtn.addEventListener("click", printPLOReport);
+  
+  var printFinrBtn = ge("btn-print-finr");
+  if(printFinrBtn) printFinrBtn.addEventListener("click", printFinalResultsReport);
+  
+  var printGrdBtn = ge("btn-print-grd");
+  if(printGrdBtn) printGrdBtn.addEventListener("click", printGradeDistribution);  
+
+  ge("btn-save-info").addEventListener("click",function(){
+    D.info.year = ge("s-year").value;
+    D.info.sem = ge("s-sem").value;
+    D.info.name = ge("s-name").value;
+    var codeRaw = ge("s-code-full") ? ge("s-code-full").value.trim() : "";
+    var codeParts = codeRaw.split("-");
+    D.info.c1 = codeParts[0] || "";
+    D.info.c2 = codeParts[1] || "";
+    D.info.c3 = codeParts[2] || "";
+    D.info.sec = ge("s-sec").value;
+    D.info.cr = ge("s-cr").value;
+    D.info.nstu = ge("s-nstu").value;
+    D.info.inst = ge("s-inst").value;
+    D.info.started = ge("s-started").value;
+    D.info.denied = ge("s-denied").value;
+    D.info.withdrawn = ge("s-withdrawn").value;
+    D.info.incomplete = ge("s-incomplete").value;
+    D.info.absent = ge("s-absent").value;
+
+    updateInfoCard();
+    saveD();
+    toast("✅ Data saved");
+  });
+  
+  ge("s-name").addEventListener("input",function(){
+    ge("hdr-name").textContent = this.value.trim() || "Course";
+  });
+  
+  ge("btn-add-stu").addEventListener("click",function(){
+    var id = ge("ns-id").value.trim();
+    var name = ge("ns-name").value.trim();
+    if(!name){ toast("⚠ Enter name"); return; }
+    D.students.push({id:id,name:name});
+    ge("ns-id").value = ""; ge("ns-name").value = "";
+    saveD(); renderStus(); toast("✅ Student added");
+  });
+  
+  ge("btn-bulk-tog").addEventListener("click",function(){
+    var a = ge("bulk-area");
+    a.style.display = a.style.display === "none" ? "block" : "none";
+  });
+  
+  ge("btn-bulk-add").addEventListener("click",function(){
+    var lines = ge("bulk-txt").value.trim().split("\n").filter(function(l){ return l.trim(); });
+    var n = 0;
+    lines.forEach(function(l){
+      var p = l.trim().split(/[\t,،\s]+/);
+      if(p.length >= 2 && /^\d{5,}$/.test(p[0])){
+        D.students.push({id:p[0], name:p.slice(1).join(" ")});
+        n++;
+      } else if(p[0]){
+        D.students.push({id:"", name:l.trim()});
+        n++;
+      }
+    });
+    saveD(); renderStus(); ge("bulk-txt").value = ""; toast("✅ Added "+n+" students");
+  });
+  
+  ge("btn-clr-stus").addEventListener("click",function(){
+    if(!confirm("Clear all students?")) return;
+    D.students = []; saveD(); renderStus(); toast("🗑 Cleared");
+  });
+  
+  ge("stu-body").addEventListener("click",function(e){
+    var btn = e.target.closest("[data-act=del-stu]");
+    if(!btn) return;
+    if(!confirm("Delete student?")) return;
+    D.students.splice(parseInt(btn.getAttribute("data-i")),1);
+    saveD(); renderStus(); toast("🗑 Deleted");
+  });
+  
+  ge("btn-add-plo").addEventListener("click",function(){
+    var code = ge("np-code").value.trim();
+    var desc = ge("np-desc").value.trim();
+    if(!code || !desc){ toast("⚠ Enter code and description"); return; }
+    var obj = {code:code, type:ge("np-type").value, desc:desc};
+    var ei = ge("np-ei").value;
+    if(ei !== "") D.plos[parseInt(ei)] = obj;
+    else D.plos.push(obj);
+    ge("np-code").value = ""; ge("np-desc").value = ""; ge("np-ei").value = "";
+    ge("btn-add-plo").textContent = "➕ Add";
+    ge("btn-cancel-plo").style.display = "none";
+    saveD(); renderPLOs(); updatePLOSel("nc-plo"); toast("✅ Done");
+  });
+  
+  ge("btn-cancel-plo").addEventListener("click",function(){
+    ge("np-code").value = ""; ge("np-desc").value = ""; ge("np-ei").value = "";
+    ge("btn-add-plo").textContent = "➕ Add";
+    this.style.display = "none";
+  });
+  
+  ge("plo-list").addEventListener("click",function(e){
+    var btn = e.target.closest("[data-act]");
+    if(!btn) return;
+    var i = parseInt(btn.getAttribute("data-i"));
+    var act = btn.getAttribute("data-act");
+    if(act === "del-plo"){ if(!confirm("Delete?")) return; D.plos.splice(i,1); saveD(); renderPLOs(); toast("🗑 Deleted"); }
+    if(act === "edit-plo"){
+      var pl = D.plos[i];
+      ge("np-ei").value = i; ge("np-code").value = pl.code; ge("np-type").value = pl.type; ge("np-desc").value = pl.desc;
+      ge("btn-add-plo").textContent = "💾 Save Edit";
+      ge("btn-cancel-plo").style.display = "inline-flex";
+      ge("pg-plos").scrollIntoView({behavior:"smooth"});
+    }
+  });
+  
+ge("btn-add-clo").addEventListener("click",function(){
+  var code = ge("nc-code").value.trim();
+  var desc = ge("nc-desc").value.trim();
+  if(!code || !desc){ toast("⚠ Enter code and description"); return; }
+  var obj = {
+    code: code,
+    type: ge("nc-type").value,
+    desc: desc,
+    bloom: ge("nc-bloom").value,
+    pass: parseInt(ge("nc-pass").value)||70,
+    plo: ge("nc-plo").value,
+    assessmentMethods: ge("nc-assessment-methods") ? ge("nc-assessment-methods").value : ""
+  };
+  var ei = ge("nc-ei").value;
+  if(ei !== "") D.clos[parseInt(ei)] = obj;
+  else D.clos.push(obj);
+  ge("nc-code").value = "";
+  ge("nc-desc").value = "";
+  ge("nc-ei").value = "";
+  if(ge("nc-assessment-methods")) ge("nc-assessment-methods").value = "";
+  ge("btn-add-clo").textContent = "➕ Add";
+  ge("btn-cancel-clo").style.display = "none";
+  saveD();
+  renderCLOs();
+  toast("✅ Done");
+});
+  ge("btn-cancel-clo").addEventListener("click",function(){
+    ge("nc-code").value = ""; ge("nc-desc").value = ""; ge("nc-ei").value = "";
+    ge("btn-add-clo").textContent = "➕ Add";
+    this.style.display = "none";
+  });
+  
+  ["stab-all","stab-K","stab-S","stab-V"].forEach(function(id){
+    ge(id).addEventListener("click",function(){
+      cloFilt = id === "stab-all" ? "all" : id.replace("stab-","");
+      document.querySelectorAll(".stab:not([data-act])").forEach(function(s){ s.classList.remove("on"); });
+      this.classList.add("on");
+      renderCLOs();
+    });
+  });
+  
+  ge("clo-list").addEventListener("click",function(e){
+    var btn = e.target.closest("[data-act]");
+    if(!btn) return;
+    var i = parseInt(btn.getAttribute("data-i"));
+    var act = btn.getAttribute("data-act");
+    if(act === "del-clo"){ if(!confirm("Delete?")) return; D.clos.splice(i,1); saveD(); renderCLOs(); toast("🗑 Deleted"); }
+    if(act === "edit-clo"){
+      var c = D.clos[i];
+      ge("ec-i").value = i; ge("ec-code").value = c.code; ge("ec-type").value = c.type; ge("ec-desc").value = c.desc;
+      ge("ec-bloom").value = c.bloom; ge("ec-pass").value = c.pass;
+      updatePLOSel("ec-plo"); ge("ec-plo").value = c.plo || "";
+      if(ge("ec-assessment-methods")) ge("ec-assessment-methods").value = c.assessmentMethods || "";
+      openMo("mo-clo");
+
+    }
+  });
+
+
+  ge("mo-clo-x").addEventListener("click",function(){ closeMo("mo-clo"); });
+  ge("btn-cancel-ec").addEventListener("click",function(){ closeMo("mo-clo"); });
+  ge("btn-save-ec").addEventListener("click",function(){
+    var i = parseInt(ge("ec-i").value);
+    D.clos[i] = {
+      code: ge("ec-code").value.trim(),
+      type: ge("ec-type").value,
+      desc: ge("ec-desc").value.trim(),
+      bloom: ge("ec-bloom").value,
+      pass: parseInt(ge("ec-pass").value)||70,
+      plo: ge("ec-plo").value,
+      assessmentMethods: ge("ec-assessment-methods") ? ge("ec-assessment-methods").value : ""
+    };
+    saveD(); 
+    closeMo("mo-clo"); 
+    renderCLOs(); 
+    toast("✅ Updated");
+  });
+ 
+  document.addEventListener("click",function(e){
+    var btn = e.target.closest("[data-act]");
+    if(!btn) return;
+    var act = btn.getAttribute("data-act");
+    var aid = btn.getAttribute("data-aid");
+    var ei = parseInt(btn.getAttribute("data-ei")||"0");
+    if(act === "exam-tab"){ D.activeExam[aid] = ei; renderAssess(aid); return; }
+    if(act === "upd-qcount"){ var aconf = getAssess(aid); var ex = aconf.exams[ei]; var qc = parseInt(ge("qcount-"+aid).value)||5; ex.qcount = qc; saveD(); renderAssess(aid); toast("✅ Updated"); return; }
+    if(act === "save-act-name"){ var aconfA = getAssess(aid); var exA = aconfA.exams[ei]; var nameInp = ge("act-name-"+ei); if(nameInp){ exA.actName = nameInp.value.trim(); } saveD(); renderAssess(aid); toast("✅ Activity name saved"); return; }
+    if(act === "save-mx"){ var aconf2 = getAssess(aid); var ex2 = aconf2.exams[ei]; var qcount = ex2.qcount||5; if(!ex2.mx) ex2.mx = {}; D.clos.forEach(function(clo){ if(!ex2.mx[clo.code]) ex2.mx[clo.code] = {}; for(var qn=1;qn<=qcount;qn++){ var inp = document.querySelector('.mxi[data-aid="'+aid+'"][data-ei="'+ei+'"][data-clo="'+clo.code+'"][data-q="'+qn+'"]'); ex2.mx[clo.code][String(qn)] = inp ? parseFloat(inp.value)||0 : 0; } }); saveD(); toast("✅ Matrix saved"); renderAssess(aid); return; }
+    if(act === "fill-rand"){ var aconf3 = getAssess(aid); var ex3 = aconf3.exams[ei]; var mx3 = ex3.mx||{}; var qcount3 = ex3.qcount||0; if(!ex3.scores) ex3.scores = {}; D.students.forEach(function(_,si){ if(!ex3.scores[String(si)]) ex3.scores[String(si)] = {}; for(var qn=1;qn<=qcount3;qn++){ var qMax = 0; D.clos.forEach(function(c){ qMax += parseFloat((mx3[c.code]||{})[String(qn)])||0; }); if(qMax>0){ var v = Math.round((Math.random()*0.6+0.4)*qMax*2)/2; ex3.scores[String(si)][String(qn)] = Math.min(v,qMax); } } }); saveD(); renderAssess(aid); toast("✅ Random fill done"); return; }
+    if(act === "save-sc"){ var aconf4 = getAssess(aid); var ex4 = aconf4.exams[ei]; var qcount4 = ex4.qcount||0; if(!ex4.scores) ex4.scores = {}; D.students.forEach(function(_,si){ if(!ex4.scores[String(si)]) ex4.scores[String(si)] = {}; for(var qn=1;qn<=qcount4;qn++){ var inp = document.querySelector('.si[data-aid="'+aid+'"][data-ei="'+ei+'"][data-si="'+si+'"][data-qn="'+qn+'"]'); if(inp) ex4.scores[String(si)][String(qn)] = parseFloat(inp.value)||0; } }); saveD(); toast("✅ Scores saved"); return; }
+  });
+  
+  document.addEventListener("input",function(e){
+    var inp = e.target;
+    if(!inp.classList.contains("si")) return;
+    var aid = inp.getAttribute("data-aid");
+    var ei = parseInt(inp.getAttribute("data-ei"));
+    var si = parseInt(inp.getAttribute("data-si"));
+    var aconf = getAssess(aid);
+    var ex = aconf.exams[ei];
+    var mx = ex.mx||{};
+    var qcount = ex.qcount||0;
+    var totalMax = 0;
+    for(var qn=1;qn<=qcount;qn++){ var qm=0; D.clos.forEach(function(c){ qm+=parseFloat((mx[c.code]||{})[String(qn)])||0; }); totalMax+=qm; }
+    var tot=0;
+    for(var qn2=1;qn2<=qcount;qn2++){ var inp2 = document.querySelector('.si[data-aid="'+aid+'"][data-ei="'+ei+'"][data-si="'+si+'"][data-qn="'+qn2+'"]'); if(inp2) tot+=parseFloat(inp2.value)||0; }
+    var pct = totalMax>0 ? Math.round(tot/totalMax*100) : 0;
+    var te = ge("tot-"+si); if(te) te.textContent = tot+"/"+totalMax;
+    var pe = ge("pct-"+si); if(pe){ pe.textContent = pct+"%"; pe.style.color = bc(pct,60); }
+    var curQn = inp.getAttribute("data-qn");
+    var qMaxCur = 0; D.clos.forEach(function(c){ qMaxCur+=parseFloat((mx[c.code]||{})[String(curQn)])||0; });
+    inp.classList.toggle("ov", qMaxCur>0 && parseFloat(inp.value)>qMaxCur);
+  });
+  
+  document.addEventListener("input",function(e){
+    var inp = e.target;
+    if(!inp.classList.contains("mxi")) return;
+    var v = parseFloat(inp.value)||0;
+    inp.classList.toggle("hv", v>0);
+  });
+  
+  ge("ptab-sum").addEventListener("click",function(){
+    ge("ptab-sum").classList.add("on"); ge("ptab-det").classList.remove("on");
+    ge("ps-sum").classList.add("on"); ge("ps-det").classList.remove("on");
+  });
+  ge("ptab-det").addEventListener("click",function(){
+    ge("ptab-det").classList.add("on"); ge("ptab-sum").classList.remove("on");
+    ge("ps-det").classList.add("on"); ge("ps-sum").classList.remove("on");
+  });
+  
+  ge("btn-exp-clor").addEventListener("click",function(){
+    var rows = ["\uFEFFOutcome,Type,Description,Weights,Achievement %,Target,Status"];
+    D.clos.forEach(function(c){
+      var w=0; D.assessments.forEach(function(a){ a.exams.forEach(function(ex){ var mx=ex.mx||{}; Object.values(mx[c.code]||{}).forEach(function(v){ w+=parseFloat(v)||0; }); }); });
+      var p=cloAchPct(c);
+      rows.push(c.code+","+TYL[c.type]+',"'+c.desc+'",'+w+","+(p!==null?p+"%":"—")+","+c.pass+"%,"+(p!==null&&p>=c.pass?"Achieved":"—"));
+    });
+    dl(rows.join("\n"),"clo_report.csv","text/csv;charset=utf-8");
+  });
+  
+  ge("btn-exp-finr").addEventListener("click",function(){
+    var rows = ["\uFEFFStudent ID,Name,"+D.clos.map(function(c){ return c.code; }).join(",")+",Total %,Grade,Status"];
+    D.students.forEach(function(s,si){
+      var cells = D.clos.map(function(c){ var p=stuCLOpct(si,c.code); return p!==null?p+"%":"—"; });
+      var tot=stuTotal(si);
+      rows.push(s.id+',"'+s.name+'",'+cells.join(",")+","+(tot!==null?tot+"%":"—")+","+(tot!==null?gfn(tot):"—")+","+(tot!==null&&tot>=60?"Passed":"Failed"));
+    });
+    dl(rows.join("\n"),"final_report.csv","text/csv;charset=utf-8");
+  });
+  
+ge("btn-print-report").addEventListener("click", printOfficialCard);
+  
+  ge("btn-exp-json").addEventListener("click",function(){
+    dl(JSON.stringify(D,null,2),STORE_KEY+"_"+new Date().toISOString().split("T")[0]+".json","application/json");
+  });
+  ge("btn-imp-json").addEventListener("click",function(){ ge("imp-file").click(); });
+  ge("imp-file").addEventListener("change",function(){
+    var f = this.files[0]; if(!f) return;
+    var r = new FileReader();
+    r.onload = function(e){ try{ D=JSON.parse(e.target.result); saveD(); updateInfoCard(); navTo("info"); toast("✅ Data imported"); } catch(ex){ toast("⚠ Invalid file"); } };
+    r.readAsText(f); this.value = "";
+  });
+  ge("btn-clr-all").addEventListener("click",function(){
+    if(!confirm("Clear all data?")) return;
+    localStorage.removeItem(STORE_KEY); location.reload();
+  });
+  
+  navTo("info");
+});
+initCourseReport();
+</script>
+</body>
+</html>
