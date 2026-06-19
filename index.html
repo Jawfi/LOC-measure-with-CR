@@ -572,7 +572,7 @@ textarea.fc{resize:vertical;min-height:58px}
         <table style="width:100%;border-collapse:collapse;font-size:12px;direction:ltr">
           <thead><tr style="background:var(--pr);color:#fff">
             <th style="padding:6px 10px;text-align:right;border:1px solid #ccc">Outcome</th>
-            <th style="padding:6px 10px;text-align:right;border:1px solid #ccc">Description</th>
+            <th style="padding:6px 10px;text-align:center;border:1px solid #ccc">Description</th>
             <th style="padding:6px 10px;text-align:center;border:1px solid #ccc">Type</th>
             <th style="padding:6px 10px;text-align:center;border:1px solid #ccc">PLO</th>
             <th style="padding:6px 10px;text-align:center;border:1px solid #ccc">Achievement %</th>
@@ -588,7 +588,7 @@ textarea.fc{resize:vertical;min-height:58px}
         <table style="width:100%;border-collapse:collapse;font-size:12px;direction:ltr">
           <thead><tr style="background:var(--pr);color:#fff">
             <th style="padding:6px 10px;text-align:right;border:1px solid #ccc">PLO</th>
-            <th style="padding:6px 10px;text-align:right;border:1px solid #ccc">Description</th>
+            <th style="padding:6px 10px;text-align:center;border:1px solid #ccc">Description</th>
             <th style="padding:6px 10px;text-align:center;border:1px solid #ccc">Achievement %</th>
             <th style="padding:6px 10px;text-align:center;border:1px solid #ccc">Status</th>
           </tr></thead>
@@ -822,14 +822,14 @@ function stuCLOpct(si,cloCode){
       }
     });
   });
-  return totalMax>0?Math.round(totalEarned/totalMax*100):null;
+return totalMax > 0 ? parseFloat((totalEarned / totalMax * 100).toFixed(2)) : null;
 }
 
 function cloAchPct(clo){
   var pcts=[];
   D.students.forEach(function(_,i){var p=stuCLOpct(i,clo.code);if(p!==null)pcts.push(p);});
   if(!pcts.length)return null;
-  return Math.round(pcts.filter(function(v){return v>=clo.pass;}).length/pcts.length*100);
+return parseFloat((pcts.filter(function(v){ return v >= clo.pass; }).length / pcts.length * 100).toFixed(2));
 }
 
 function stuTotal(si){
@@ -849,7 +849,7 @@ function stuTotal(si){
       }
     });
   });
-  return totalMax>0?Math.round(totalEarned/totalMax*100):null;
+return totalMax > 0 ? parseFloat((totalEarned / totalMax * 100).toFixed(2)) : null;
 }
 
 function renderReport(){
@@ -1382,10 +1382,10 @@ function renderGRD(){
   var cnt={};gn.forEach(function(g){cnt[g]=0;});var total=0;
   D.students.forEach(function(_,i){var t=stuTotal(i);if(t!==null){cnt[gfn(t)]++;total++;}});
 ge("grd-cells").innerHTML = gn.map(function(g) {
-  return '<div style="flex:0 0 42px;background:var(--bg);border-radius:4px;padding:3px 1px;text-align:center;border-top:2px solid ' + (GCL[g]) + '">' +
-    '<div style="font-size:8px;color:var(--mu);margin-bottom:1px">' + g + '</div>' +
-    '<div style="font-size:16px;font-weight:800;color:' + GCL[g] + '">' + cnt[g] + '</div>' +
-    '<div style="font-size:7px;color:var(--mu)">' + (total ? Math.round(cnt[g] / total * 100) + "%" : "0%") + '</div></div>';
+  return '<div style="flex:0 0 58px;background:var(--bg);border-radius:4px;padding:2px 1px;text-align:center;border-top:2px solid ' + (GCL[g]) + ';white-space:nowrap;overflow:hidden;">' +
+    '<div style="font-size:7px;color:var(--mu);margin-bottom:1px">' + g + '</div>' +
+    '<div style="font-size:14px;font-weight:800;color:' + GCL[g] + '">' + cnt[g] + '</div>' +
+    '<div style="font-size:6px;color:var(--mu)">' + (total ? (cnt[g] / total * 100).toFixed(2) + "%" : "0%") + '</div></div>';
 }).join('');
   var cv=ge("grd-cv");var ctx=cv.getContext("2d");
   var w=cv.width=cv.parentElement.offsetWidth||600,h=cv.height=100;
@@ -1675,7 +1675,7 @@ function printFinalReport(){
   var gradePercentRow = "";
   gn.forEach(function(g){ 
     gradeNumberRow += '<td style="text-align:center;padding:8px;border:1px solid #ccc">' + cnt[g] + '</td>';
-    gradePercentRow += '<td style="text-align:center;padding:8px;border:1px solid #ccc">' + (valid.length ? Math.round(cnt[g] / valid.length * 100) + "%" : "0%") + '</td>';
+    gradePercentRow += '<td style="text-align:center;padding:8px;border:1px solid #ccc">' + (valid.length ? (cnt[g] / valid.length * 100).toFixed(2) + "%" : "0%") + '</td>';
   });
   
   // صفوف المواضيع غير المغطاة
@@ -1709,27 +1709,34 @@ function printFinalReport(){
   
   // بناء HTML النهائي مطابق لـ TP-154
   var printHtml = '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
-    '<title>Course Report - ' + escapeHtmlSafe(info.name || "") + '</title>' +
-    '<style>' +
-    'body { font-family: Arial, sans-serif; font-size: 11pt; margin: 2cm; line-height: 1.4; }' +
-    '.header { text-align: center; margin-bottom: 20px; }' +
-    '.header-title { font-size: 16pt; font-weight: bold; color: #11426E; }' +
-    '.header-subtitle { font-size: 12pt; color: #555; }' +
-    'table { border-collapse: collapse; width: 100%; margin: 10px 0; }' +
-    'th, td { border: 1px solid #999; padding: 8px; vertical-align: top; }' +
-    'th { background: #11426E; color: white; font-weight: bold; text-align: center; }' +
-    '.section-title { font-size: 14pt; font-weight: bold; margin: 20px 0 10px; border-bottom: 2px solid #C9A84C; padding-bottom: 5px; }' +
-    '.sub-title { font-size: 12pt; font-weight: bold; margin: 15px 0 8px; }' +
-    '.grade-table th, .grade-table td { border: 1px solid #ccc; padding: 8px; text-align: center; }' +
-    '.grade-table th { background: #11426E; color: white; }' +
-    '.comment-box { background: #f9f9f9; padding: 12px; border-left: 4px solid #C9A84C; margin: 10px 0; }' +
-    '.signatures { display: flex; justify-content: space-between; margin-top: 30px; }' +
-    '.signature { text-align: center; flex: 1; }' +
-    '.signature-line { border-top: 1px solid #000; width: 70%; margin: 0 auto; padding-top: 5px; }' +
-    '.footer-text { text-align: center; margin-top: 20px; font-size: 9pt; color: #666; }' +
-    '@media print { body { margin: 1.5cm; } .no-print { display: none; } }' +
-    '</style>' +
-    '<body>' +
+  '<title>Course Report - ' + escapeHtmlSafe(info.name || "") + '</title>' +
+  '<style>' +
+  'body { font-family: Arial, sans-serif; font-size: 11pt; margin: 2cm; line-height: 1.4; }' +
+  '.header { text-align: center; margin-bottom: 20px; }' +
+  '.header-title { font-size: 16pt; font-weight: bold; color: #11426E; }' +
+  '.header-subtitle { font-size: 12pt; color: #555; }' +
+  'table { border-collapse: collapse; width: 100%; margin: 10px 0; }' +
+  'th, td { border: 1px solid #999; padding: 8px; vertical-align: top; }' +
+  'th { background: #11426E !important; color: #FFD700 !important; font-weight: bold; text-align: center; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }' +
+  'td { background: #ffffff !important; }' +
+  '.section-title { font-size: 14pt; font-weight: bold; margin: 20px 0 10px; border-bottom: 2px solid #C9A84C; padding-bottom: 5px; }' +
+  '.sub-title { font-size: 12pt; font-weight: bold; margin: 15px 0 8px; }' +
+  '.grade-table th, .grade-table td { border: 1px solid #ccc; padding: 8px; text-align: center; }' +
+  '.grade-table th { background: #11426E !important; color: #FFD700 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }' +
+  '.comment-box { background: #f9f9f9; padding: 12px; border-left: 4px solid #C9A84C; margin: 10px 0; }' +
+  '.signatures { display: flex; justify-content: space-between; margin-top: 30px; }' +
+  '.signature { text-align: center; flex: 1; }' +
+  '.signature-line { border-top: 1px solid #000; width: 70%; margin: 0 auto; padding-top: 5px; }' +
+  '.footer-text { text-align: center; margin-top: 20px; font-size: 9pt; color: #666; }' +
+  '@media print { ' +
+    'body { margin: 1.5cm; } ' +
+    '.no-print { display: none; } ' +
+    '* { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; } ' +
+    'th { background: #11426E !important; color: #FFFF00 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } ' +
+  '}' +
+  '</style>' +
+  '<body>' +
+  // ... باقي الكود
     
     // ==================== PAGE 1 - HEADER ====================
     '<div style="text-align:center; margin-bottom:20px;">' +
@@ -1778,64 +1785,55 @@ function printFinalReport(){
     // ==================== GRADE DISTRIBUTION ====================
     '<div class="section-title">A. Student Results</div>' +
     '<div class="sub-title">1. Grade Distribution</div>' +
-    '<table style="width:100%; border-collapse:collapse; margin-bottom:20px">' +
-    // الصف الأول - العناوين الرئيسية (خلفية زرقاء - نص أبيض)
-    '<tr style="background-color: #11426E; color: white;">' +
-    '<th rowspan="2" style="border:1px solid #999; padding:8px; text-align:center; vertical-align:middle;">&nbsp;</th>' +
-    '<th colspan="9" style="border:1px solid #999; padding:8px; text-align:center;">Grades</th>' +
-    '<th colspan="7" style="border:1px solid #999; padding:8px; text-align:center;">Status Distributions</th>' +
-    '</tr>' +
-    // الصف الثاني - التفاصيل (خلفية زرقاء - نص أبيض)
-    '<tr style="background-color: #11426E; color: white;">' +
-    '<th style="border:1px solid #999; padding:8px;">A+</th><th>A</th><th>B+</th><th>B</th><th>C+</th><th>C</th><th>D+</th><th>D</th><th>F</th>' +
-    '<th>Denied Entry</th><th>In Progress</th><th>Incomplete</th><th>Pass</th><th>Fail</th><th>Withdrawn</th>' +
-    '</tr>' +
-    // صف الأعداد
-    '<tr style="background-color: #fff;">' +
-    // صف الأعداد
-    '<tr style="background-color: #fff;">' +
-    '<td style="border:1px solid #999; padding:8px; font-weight:bold; background-color:#f5f5f5;"><span style="color:#000;">Number of Students</span></td>' +
-    // Grades (9 أعمدة)
-    '<td style="border:1px solid #999; padding:8px; text-align:center;"><span style="color:#000;">' + cnt["A+"] + '</span></td>' +
-    '<td style="text-align:center;"><span style="color:#000;">' + cnt["A"] + '</span></td>' +
-    '<td style="text-align:center;"><span style="color:#000;">' + cnt["B+"] + '</span></td>' +
-    '<td style="text-align:center;"><span style="color:#000;">' + cnt["B"] + '</span></td>' +
-    '<td style="text-align:center;"><span style="color:#000;">' + cnt["C+"] + '</span></td>' +
-    '<td style="text-align:center;"><span style="color:#000;">' + cnt["C"] + '</span></td>' +
-    '<td style="text-align:center;"><span style="color:#000;">' + cnt["D+"] + '</span></td>' +
-    '<td style="text-align:center;"><span style="color:#000;">' + cnt["D"] + '</span></td>' +
-    '<td style="text-align:center;"><span style="color:#000;">' + cnt["F"] + '</span></td>' +
-    // Status Distributions (6 أعمدة)
-    '<td style="text-align:center;"><span style="color:#000;">' + denied + '</span></td>' +                 // Denied Entry
-    '<td style="text-align:center;"><span style="color:#000;">' + completed + '</span></td>' +   // In Progress
-    '<td style="text-align:center;"><span style="color:#000;">' + incomplete + '</span></td>' +            // Incomplete
-    '<td style="text-align:center; background-color:#d4f2e4; font-weight:bold;"><span style="color:#000;">' + passed + '</span></td>' +   // Pass
-    '<td style="text-align:center; background-color:#fde0e0; font-weight:bold;"><span style="color:#000;">' + failed + '</span></td>' +   // Fail
-    '<td style="text-align:center;"><span style="color:#000;">' + withdrawn + '</span></td>' +            // Withdrawn
-    '</tr>' +
-    // صف النسب المئوية
-    // صف النسب المئوية
-    '<tr style="background-color: #fff;">' +
-    '<td style="border:1px solid #999; padding:8px; font-weight:bold; background-color:#f5f5f5;"><span style="color:#000;">Percentage</span></td>' +
-    // Grades (9 أعمدة)
-    '<td style="text-align:center;"><span style="color:#000;">' + (valid.length ? Math.round(cnt["A+"] / valid.length * 100) + "%" : "0%") + '</span></td>' +
-    '<td style="text-align:center;"><span style="color:#000;">' + (valid.length ? Math.round(cnt["A"] / valid.length * 100) + "%" : "0%") + '</span></td>' +
-    '<td style="text-align:center;"><span style="color:#000;">' + (valid.length ? Math.round(cnt["B+"] / valid.length * 100) + "%" : "0%") + '</span></td>' +
-    '<td style="text-align:center;"><span style="color:#000;">' + (valid.length ? Math.round(cnt["B"] / valid.length * 100) + "%" : "0%") + '</span></td>' +
-    '<td style="text-align:center;"><span style="color:#000;">' + (valid.length ? Math.round(cnt["C+"] / valid.length * 100) + "%" : "0%") + '</span></td>' +
-    '<td style="text-align:center;"><span style="color:#000;">' + (valid.length ? Math.round(cnt["C"] / valid.length * 100) + "%" : "0%") + '</span></td>' +
-    '<td style="text-align:center;"><span style="color:#000;">' + (valid.length ? Math.round(cnt["D+"] / valid.length * 100) + "%" : "0%") + '</span></td>' +
-    '<td style="text-align:center;"><span style="color:#000;">' + (valid.length ? Math.round(cnt["D"] / valid.length * 100) + "%" : "0%") + '</span></td>' +
-    '<td style="text-align:center;"><span style="color:#000;">' + (valid.length ? Math.round(cnt["F"] / valid.length * 100) + "%" : "0%") + '</span></td>' +
-    // Status Distributions (6 أعمدة)
-    '<td style="text-align:center;"><span style="color:#000;">' + (started ? Math.round(denied / started * 100) + "%" : "0%") + '</span></td>' +        // Denied Entry
-    '<td style="text-align:center;"><span style="color:#000;">' + (started ? Math.round(completed / started * 100) + "%" : "0%") + '</span></td>' +   // In Progress
-    '<td style="text-align:center;"><span style="color:#000;">' + (started ? Math.round(incomplete / started * 100) + "%" : "0%") + '</span></td>' +   // Incomplete
-    '<td style="text-align:center; background-color:#d4f2e4; font-weight:bold;"><span style="color:#000;">' + (started ? Math.round(passed / started * 100) + "%" : "0%") + '</span></td>' +   // Pass
-    '<td style="text-align:center; background-color:#fde0e0; font-weight:bold;"><span style="color:#000;">' + (started ? Math.round(failed / started * 100) + "%" : "0%") + '</span></td>' +   // Fail
-    '<td style="text-align:center;"><span style="color:#000;">' + (started ? Math.round(withdrawn / started * 100) + "%" : "0%") + '</span></td>' +   // Withdrawn
-    '</tr>' +
-    '</table>' +
+'<table style="width:100%; border-collapse:collapse; margin-bottom:20px">' +
+'<tr style="background-color: #11426E; color: #FFD700;">' +
+'<th rowspan="2" style="border:1px solid #999; padding:8px; text-align:center; vertical-align:middle;">&nbsp;</th>' +
+'<th colspan="9" style="border:1px solid #999; padding:8px; text-align:center;">Grades</th>' +
+'<th colspan="7" style="border:1px solid #999; padding:8px; text-align:center;">Status Distributions</th>' +
+'</tr>' +
+'<tr style="background-color: #11426E; color: #FFD700;">' +
+'<th style="border:1px solid #999; padding:8px;">A+</th><th>A</th><th>B+</th><th>B</th><th>C+</th><th>C</th><th>D+</th><th>D</th><th>F</th>' +
+'<th>Denied Entry</th><th>In Prog ress</th><th>Inco mplete</th><th>Pass</th><th>Fail</th><th>With drawn</th>' +
+'</tr>' +
+// صف الأعداد
+'<tr style="background-color: #fff;">' +
+'<td style="border:1px solid #999; padding:8px; font-weight:bold; background-color:#f5f5f5;"><span style="color:#000;">Number of Students</span></td>' +
+'<td style="border:1px solid #999; padding:8px; text-align:center;"><span style="color:#000;">' + cnt["A+"] + '</span></td>' +
+'<td style="text-align:center;"><span style="color:#000;">' + cnt["A"] + '</span></td>' +
+'<td style="text-align:center;"><span style="color:#000;">' + cnt["B+"] + '</span></td>' +
+'<td style="text-align:center;"><span style="color:#000;">' + cnt["B"] + '</span></td>' +
+'<td style="text-align:center;"><span style="color:#000;">' + cnt["C+"] + '</span></td>' +
+'<td style="text-align:center;"><span style="color:#000;">' + cnt["C"] + '</span></td>' +
+'<td style="text-align:center;"><span style="color:#000;">' + cnt["D+"] + '</span></td>' +
+'<td style="text-align:center;"><span style="color:#000;">' + cnt["D"] + '</span></td>' +
+'<td style="text-align:center;"><span style="color:#000;">' + cnt["F"] + '</span></td>' +
+'<td style="text-align:center;"><span style="color:#000;">' + denied + '</span></td>' +
+'<td style="text-align:center;"><span style="color:#000;">' + completed + '</span></td>' +
+'<td style="text-align:center;"><span style="color:#000;">' + incomplete + '</span></td>' +
+'<td style="text-align:center; background-color:#d4f2e4; font-weight:bold;"><span style="color:#000;">' + passed + '</span></td>' +
+'<td style="text-align:center; background-color:#fde0e0; font-weight:bold;"><span style="color:#000;">' + failed + '</span></td>' +
+'<td style="text-align:center;"><span style="color:#000;">' + withdrawn + '</span></td>' +
+'</tr>' +
+// صف النسب المئوية
+'<tr style="background-color: #fff;">' +
+'<td style="border:1px solid #999; padding:8px; font-weight:bold; background-color:#f5f5f5;"><span style="color:#000;">Percentage</span></td>' +
+'<td style="text-align:center;"><span style="color:#000;">' + (valid.length ? (cnt["A+"] / valid.length * 100).toFixed(1) + "%" : "0%") + '</span></td>' +
+'<td style="text-align:center;"><span style="color:#000;">' + (valid.length ? (cnt["A"] / valid.length * 100).toFixed(1) + "%" : "0%") + '</span></td>' +
+'<td style="text-align:center;"><span style="color:#000;">' + (valid.length ? (cnt["B+"] / valid.length * 100).toFixed(1) + "%" : "0%") + '</span></td>' +
+'<td style="text-align:center;"><span style="color:#000;">' + (valid.length ? (cnt["B"] / valid.length * 100).toFixed(1) + "%" : "0%") + '</span></td>' +
+'<td style="text-align:center;"><span style="color:#000;">' + (valid.length ? (cnt["C+"] / valid.length * 100).toFixed(1) + "%" : "0%") + '</span></td>' +
+'<td style="text-align:center;"><span style="color:#000;">' + (valid.length ? (cnt["C"] / valid.length * 100).toFixed(1) + "%" : "0%") + '</span></td>' +
+'<td style="text-align:center;"><span style="color:#000;">' + (valid.length ? (cnt["D+"] / valid.length * 100).toFixed(1) + "%" : "0%") + '</span></td>' +
+'<td style="text-align:center;"><span style="color:#000;">' + (valid.length ? (cnt["D"] / valid.length * 100).toFixed(1) + "%" : "0%") + '</span></td>' +
+'<td style="text-align:center;"><span style="color:#000;">' + (valid.length ? (cnt["F"] / valid.length * 100).toFixed(1) + "%" : "0%") + '</span></td>' +
+'<td style="text-align:center;"><span style="color:#000;">' + (started ? (denied / started * 100).toFixed(2) + "%" : "0%") + '</span></td>' +
+'<td style="text-align:center;"><span style="color:#000;">' + (started ? (completed / started * 100).toFixed(2) + "%" : "0%") + '</span></td>' +
+'<td style="text-align:center;"><span style="color:#000;">' + (started ? (incomplete / started * 100).toFixed(2) + "%" : "0%") + '</span></td>' +
+'<td style="text-align:center; background-color:#d4f2e4; font-weight:bold;"><span style="color:#000;">' + (started ? (passed / started * 100).toFixed(2) + "%" : "0%") + '</span></td>' +
+'<td style="text-align:center; background-color:#fde0e0; font-weight:bold;"><span style="color:#000;">' + (started ? (failed / started * 100).toFixed(2) + "%" : "0%") + '</span></td>' +
+'<td style="text-align:center;"><span style="color:#000;">' + (started ? (withdrawn / started * 100).toFixed(2) + "%" : "0%") + '</span></td>' +
+'</tr>' +
+'</table>' +
     
     '<div class="sub-title">2. Comment on Student Grades</div>' +
     '<div class="comment-box">' + (commentGrades.trim() ? escapeHtmlSafe(commentGrades).replace(/\n/g, '<br>') : '<span style="color:#888">[No comments entered]</span>') + '</div>' +
@@ -2206,7 +2204,7 @@ function printOfficialCard() {
     }
     #official-report-card table th {
       background: #11426E !important;
-      color: #fff !important;
+      color: #FFD700 !important;
       padding: 6px 10px;
       text-align: right;
       border: 1px solid #ccc;
