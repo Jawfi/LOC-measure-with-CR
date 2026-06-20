@@ -743,9 +743,31 @@ textarea.fc{resize:vertical;min-height:58px}
 <script>
 "use strict";
 
-// ═══════════════════════════════════════════
-// DATA
-// ═══════════════════════════════════════════
+// ============================================================
+// UNIQUE STORAGE KEY - لكل مجلد مفتاح مستقل
+// ============================================================
+function getUniqueStorageKey() {
+  // الحصول على المسار الكامل للملف
+  var fullPath = window.location.pathname;
+  
+  // تنظيف المسار مع الاحتفاظ بكل التفاصيل
+  var cleanPath = fullPath.replace(/[\/\\\.\-\s]/g, "_").replace(/_+/g, "_");
+  
+  // إزالة الـ _html من النهاية
+  cleanPath = cleanPath.replace(/_html$/, "");
+  
+  // إذا كان المفتاح فارغاً، استخدم default
+  if (!cleanPath || cleanPath === "") {
+    cleanPath = "default";
+  }
+  
+  return "clo_data_" + cleanPath;
+}
+
+var STORE_KEY = getUniqueStorageKey();
+console.log("📦 Storage Key:", STORE_KEY);
+
+
 var D = {"info": {"year": "", "sem": "", "name": "", "c1": "", "c2": "", "c3": "", "sec": "", "cr": "", "nstu": "", "inst": "", "started": "", "denied": "", "withdrawn": "", "incomplete": ""}, "students": [], "plos": [{"code": "PLO-K1", "type": "K", "desc": "Demonstrate knowledge of facts and basic concepts in Mathematics and Statistics."}, {"code": "PLO-S1", "type": "S", "desc": "Solve pure and applied mathematical problems."}, {"code": "PLO-S2", "type": "S", "desc": "Formulate mathematical proofs clearly and explicitly."}, {"code": "PLO-S3", "type": "S", "desc": "Combine multiple mathematical techniques to solve mathematical problems."}, {"code": "PLO-S4", "type": "S", "desc": "Present mathematical ideas clearly, both orally and in writing."}, {"code": "PLO-S5", "type": "S", "desc": "Use specialized mathematical software to solve various problems."}, {"code": "PLO-V1", "type": "V", "desc": "Work in a team, take responsibility and commit to community values."}, {"code": "PLO-V2", "type": "V", "desc": "Autonomy and continuous self-learning."}], "clos": [], "assessments": [{"id": "qz", "label": "Quizzes", "icon": "📝", "exams": [{"name": "Quiz 1", "qcount": 5, "mx": {}, "scores": {}}, {"name": "Quiz 2", "qcount": 5, "mx": {}, "scores": {}}, {"name": "Quiz 3", "qcount": 5, "mx": {}, "scores": {}}, {"name": "Quiz 4", "qcount": 5, "mx": {}, "scores": {}}]}, {"id": "as", "label": "Assignments", "icon": "📄", "exams": [{"name": "Assignment 1", "qcount": 5, "mx": {}, "scores": {}}, {"name": "Assignment 2", "qcount": 5, "mx": {}, "scores": {}}, {"name": "Assignment 3", "qcount": 5, "mx": {}, "scores": {}}, {"name": "Assignment 4", "qcount": 5, "mx": {}, "scores": {}}]}, {"id": "mt", "label": "Midterm Exams", "icon": "📑", "exams": [{"name": "Mid Term Exam I", "qcount": 5, "mx": {}, "scores": {}}, {"name": "Mid Term Exam II", "qcount": 5, "mx": {}, "scores": {}}]}, {"id": "fe", "label": "Final Exam", "icon": "🏁", "exams": [{"name": "Final Exam", "qcount": 5, "mx": {}, "scores": {}}]}, {"id": "lb", "label": "Labs", "icon": "🔬", "exams": [{"name": "Mid Lab Exam", "qcount": 5, "mx": {}, "scores": {}}, {"name": "Final Lab Exam", "qcount": 5, "mx": {}, "scores": {}}]}, {"id": "act", "label": "Other Activities", "icon": "🎯", "exams": [{"name": "Activity 1", "qcount": 3, "mx": {}, "scores": {}}, {"name": "Activity 2", "qcount": 3, "mx": {}, "scores": {}}, {"name": "Activity 3", "qcount": 3, "mx": {}, "scores": {}}, {"name": "Activity 4", "qcount": 3, "mx": {}, "scores": {}}]}], "activeExam": {"qz": 0, "as": 0, "mt": 0, "fe": 0, "lb": 0, "act": 0}};
 
 // ═══════════════════════════════════════════
@@ -775,7 +797,22 @@ function syncCodeParts(val){
   if(ge("s-c2"))ge("s-c2").value=parts[1]||"";
   if(ge("s-c3"))ge("s-c3").value=parts[2]||"";
 }
-var STORE_KEY="my_clo_system_data";
+
+// ============================================================
+// UNIQUE STORAGE KEY - لكل ملف منسوخ مفتاح مستقل
+// ============================================================
+function getUniqueStorageKey() {
+  var path = window.location.pathname;
+  var fullPath = path.replace(/[\/\\\.\-\s]/g, "_").replace(/_+/g, "_");
+  fullPath = fullPath.replace(/_html$/, "");
+  if (!fullPath || fullPath === "") {
+    fullPath = "default";
+  }
+  return "clo_data_" + fullPath;
+}
+
+var STORE_KEY = getUniqueStorageKey();
+console.log("📦 Storage Key:", STORE_KEY);
 
 function saveD(){try{localStorage.setItem(STORE_KEY,JSON.stringify(D));}catch(e){}}
 function loadD(){try{var x=localStorage.getItem(STORE_KEY);if(x)D=JSON.parse(x);}catch(e){}}
@@ -1647,7 +1684,9 @@ function printFinalReport(){
 '<td style="border:1px solid #ccc;padding:8px;font-size:9pt">' + (c.assessmentMethods || "—") + '</td>' +
           '<td style="border:1px solid #ccc;padding:8px;text-align:center">' + c.pass + '%</td>' +
           '<td style="border:1px solid #ccc;padding:8px;text-align:center;font-weight:bold;color:' + (p !== null ? (p >= c.pass ? "#1a7a4a" : "#c0392b") : "#888") + '">' + (p !== null ? p + "%" : "—") + '</td>' +
-          '<td style="border:1px solid #ccc;padding:8px"> </td>' +
+        '<td style="border:1px solid #ccc;padding:8px;text-align:center;font-weight:bold;color:' + (p !== null ? (p >= 80 ? "#1a7a4a" : (p >= c.pass ? "#C9A84C" : "#c0392b")) : "#888") + '">' + 
+  (p !== null ? (p >= 80 ? "Excellent ✅" : (p >= c.pass ? "Acceptable ⚠" : "Below Level ❌")) : "—") + 
+'</td>' +
           '</tr>';
       });
     }
